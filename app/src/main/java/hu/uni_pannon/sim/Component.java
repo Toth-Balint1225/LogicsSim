@@ -2,6 +2,7 @@ package hu.uni_pannon.sim;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.LinkedList;
 
@@ -32,11 +33,46 @@ public class Component {
         }
     }
 
+    protected class Cache {
+        private Map<String,Boolean> outs;
+        private boolean isSet;
+
+        public Cache(List<String> labels) {
+            isSet = false;
+            outs = new TreeMap<>();
+            labels.stream()
+                .forEach((str) -> outs.put(str,false));
+        }
+
+        public boolean get(String key) {
+            return outs.get(key);
+        }
+
+        public Set<String> keys() {
+            return outs.keySet();
+        }
+
+        public void store(List<String> evalInputs) throws InvalidParamException {
+            for (String key : outs.keySet()) {
+                outs.put(key,Component.this.lut.evaluate(evalInputs,key));
+            }
+            isSet = true;
+        }
+
+        public void clear() {
+            outs.entrySet().stream().forEach((entry) -> entry.setValue(false));
+            isSet = false;
+        }
+
+        public boolean isSet() {
+            return isSet;
+        }
+    }
+
     protected LookupTable lut;
 
     protected Map<String,Component> ins;
-    protected Map<String,Boolean> cache;
-    protected boolean cacheSet = false;
+    protected Cache cache;
 
     protected Component() {
     }
@@ -48,11 +84,7 @@ public class Component {
     protected void init(List<String> inputs, List<String> outputs) {
         lut = new LookupTable(inputs,outputs);
         ins = new TreeMap<>();
-        cache = new TreeMap<>();
-
-        outputs.stream()
-            .forEach((str) -> cache.put(str,false));
-        
+        cache = new Cache(outputs);
     }
 
     // for the wire
@@ -83,23 +115,21 @@ public class Component {
             if (ins.get(input).eval(input))
                 evalInputs.add(input);
         }
-        
-        for (String output : cache.keySet()) {
-            cache.put(output, lut.evaluate(evalInputs,output));
-        }
+
+        // eval stuff saved here
+        cache.store(evalInputs);
 
         // debug
         /*
         System.out.println("[CACHE] " + this);
         cache.entrySet().stream().forEach((entry) -> System.out.println(entry.getKey() + " -> " + entry.getValue()));
         */
-        cacheSet = true;
     }
 
     public boolean eval(String output) throws InvalidParamException {
         // fetch the inputs that eval to 1
         System.out.println("[EVAL] " + this + " for output " + output);
-        if (!cacheSet)
+        if (!cache.isSet())
             evalImpl();
         
         return cache.get(output);
