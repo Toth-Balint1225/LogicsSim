@@ -34,45 +34,53 @@ public class Component {
     }
 
     protected class Cache {
-        private Map<String,Boolean> outs;
+        private Map<String,Boolean> data;
         private boolean isSet;
 
         public Cache(List<String> labels) {
             isSet = false;
-            outs = new TreeMap<>();
+            data = new TreeMap<>();
             labels.stream()
-                .forEach((str) -> outs.put(str,false));
+                .forEach((str) -> data.put(str,false));
         }
 
         public boolean get(String key) {
-            return outs.get(key);
+            return data.get(key);
         }
 
         public Set<String> keys() {
-            return outs.keySet();
+            return data.keySet();
         }
 
         public void store(List<String> evalInputs) throws InvalidParamException {
-            for (String key : outs.keySet()) {
-                outs.put(key,Component.this.lut.evaluate(evalInputs,key));
+            for (String key : data.keySet()) {
+                data.put(key,Component.this.lut.evaluate(evalInputs,key));
             }
             isSet = true;
         }
 
         public void clear() {
-            outs.entrySet().stream().forEach((entry) -> entry.setValue(false));
+            data.entrySet().stream().forEach((entry) -> entry.setValue(false));
             isSet = false;
         }
 
         public boolean isSet() {
             return isSet;
         }
+
+        public void resetSoft() {
+            isSet = false;
+        }
     }
 
     protected LookupTable lut;
 
     protected Map<String,Component> ins;
-    protected Cache cache;
+    protected Map<String,Component> outs;
+    protected Cache outputCache;
+
+    protected boolean evaluating;
+    protected boolean needsForward;
 
     protected Component() {
     }
@@ -81,10 +89,18 @@ public class Component {
         init(inputs,outputs);
     }
 
+    /**
+     * Inteface function for subclasses. Do NOT delete!
+     * @param inputs
+     * @param outputs
+     */
     protected void init(List<String> inputs, List<String> outputs) {
         lut = new LookupTable(inputs,outputs);
         ins = new TreeMap<>();
-        cache = new Cache(outputs);
+        outs = new TreeMap<>();
+        outputCache = new Cache(outputs);
+        evaluating = false;
+        needsForward = false;
     }
 
     // for the wire
@@ -117,7 +133,7 @@ public class Component {
         }
 
         // eval stuff saved here
-        cache.store(evalInputs);
+        outputCache.store(evalInputs);
 
         // debug
         /*
@@ -127,12 +143,18 @@ public class Component {
     }
 
     public boolean eval(String output) throws InvalidParamException {
+        if (evaluating) {
+            needsForward = true;
+            return outputCache.get(output);
+        }
+        evaluating = true;
         // fetch the inputs that eval to 1
         System.out.println("[EVAL] " + this + " for output " + output);
-        if (!cache.isSet())
+        if (!outputCache.isSet())
             evalImpl();
         
-        return cache.get(output);
+        evaluating = false;
+        return outputCache.get(output);
     }
 
 
