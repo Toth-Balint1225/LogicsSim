@@ -46,6 +46,15 @@ public class App {
         Output sum3 = new Output();
         Output cout = new Output();
 
+        boolean res1 = false;
+        boolean res2 = false;
+        boolean res3 = false;
+        boolean resc = false;
+
+        double start = 0.0;
+        double end = 0.0;
+        double duration = 0.0;
+
         try {
             new Wire().connect("out",a0,"a",adder1); // connect(a0.out(),adder1.in("a"))
             new Wire().connect("out",b0,"b",adder1);
@@ -61,11 +70,18 @@ public class App {
             new Wire().connect("sum",adder1,"in",sum1);
             new Wire().connect("sum",adder2,"in",sum2);
             new Wire().connect("sum",adder3,"in",sum3);
-
-            System.out.println("s0 = " + (sum1.eval("out") ? 1 : 0));
-            System.out.println("s1 = " + (sum2.eval("out") ? 1 : 0));
-            System.out.println("s2 = " + (sum3.eval("out") ? 1 : 0));
-            System.out.println("cout = " + (cout.eval("out") ? 1 : 0));
+            {
+                start = System.nanoTime();
+                res1 = sum1.eval("out");
+                res2 = sum2.eval("out");
+                res3 = sum3.eval("out");
+                resc = cout.eval("out");
+                end = System.nanoTime();
+            }
+            System.out.println("s0 = " + (res1 ? 1 : 0));
+            System.out.println("s1 = " + (res2 ? 1 : 0));
+            System.out.println("s2 = " + (res3 ? 1 : 0));
+            System.out.println("cout = " + (resc ? 1 : 0));
 
         } catch (InvalidParamException ex) {
             System.err.println("Connecting failed");
@@ -73,6 +89,8 @@ public class App {
             System.exit(-69);
         }
 
+        duration = end - start;
+        System.out.println("[TIME] exec time is " + duration*1e-6 + " [ms]");
 
    }
 
