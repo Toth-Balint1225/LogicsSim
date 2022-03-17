@@ -70,6 +70,7 @@ public class Component {
     public boolean eval(String output) throws InvalidParamException {
         // TODO: cache
         // fetch the inputs that eval to 1
+        System.out.println("[EVAL] " + this + " for output " + output);
         List<String> evalInputs = new LinkedList<>();
         for (String input : ins.keySet()) {
             if (ins.get(input).eval(input))

@@ -39,6 +39,7 @@ public class Wire extends Component {
     @Override
     public boolean eval(String output) throws InvalidParamException {
         // possibly cache the value
+        System.out.println("[EVAL] " + this + " for output " + output);
         return in.eval(inId);
     }
 }
