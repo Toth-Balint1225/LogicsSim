@@ -35,6 +35,8 @@ public class Component {
     protected LookupTable lut;
 
     protected Map<String,Component> ins;
+    protected Map<String,Boolean> cache;
+    protected boolean cacheSet = false;
 
     protected Component() {
     }
@@ -46,8 +48,14 @@ public class Component {
     protected void init(List<String> inputs, List<String> outputs) {
         lut = new LookupTable(inputs,outputs);
         ins = new TreeMap<>();
+        cache = new TreeMap<>();
+
+        outputs.stream()
+            .forEach((str) -> cache.put(str,false));
+        
     }
 
+    // for the wire
     public Component addInput(String id, Component in) {
         ins.put(id,in);
         return this;
@@ -67,17 +75,34 @@ public class Component {
         return c;
     }
 
-    public boolean eval(String output) throws InvalidParamException {
-        // TODO: cache
-        // fetch the inputs that eval to 1
-        System.out.println("[EVAL] " + this + " for output " + output);
+    // this is meant to eval every output's value and put them into AR CAC'HE
+    protected void evalImpl() throws InvalidParamException {
+        // need to evaluate for the cache
         List<String> evalInputs = new LinkedList<>();
         for (String input : ins.keySet()) {
             if (ins.get(input).eval(input))
                 evalInputs.add(input);
         }
-        // eval
-        return lut.evaluate(evalInputs,output);
+        
+        for (String output : cache.keySet()) {
+            cache.put(output, lut.evaluate(evalInputs,output));
+        }
+
+        // debug
+        /*
+        System.out.println("[CACHE] " + this);
+        cache.entrySet().stream().forEach((entry) -> System.out.println(entry.getKey() + " -> " + entry.getValue()));
+        */
+        cacheSet = true;
+    }
+
+    public boolean eval(String output) throws InvalidParamException {
+        // fetch the inputs that eval to 1
+        System.out.println("[EVAL] " + this + " for output " + output);
+        if (!cacheSet)
+            evalImpl();
+        
+        return cache.get(output);
     }
 
 
