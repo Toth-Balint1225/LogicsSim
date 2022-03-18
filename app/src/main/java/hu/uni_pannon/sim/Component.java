@@ -33,7 +33,7 @@ public class Component {
         }
     }
 
-    protected class Cache {
+    public class Cache {
         private Map<String,Boolean> data;
         private boolean isSet;
 
@@ -46,6 +46,10 @@ public class Component {
 
         public boolean get(String key) {
             return data.get(key);
+        }
+
+        public void setValue(String key, boolean value) {
+            data.put(key,value);
         }
 
         public Set<String> keys() {
@@ -64,13 +68,14 @@ public class Component {
             isSet = false;
         }
 
+        public void softClear() {
+            isSet = false;
+        }
+
         public boolean isSet() {
             return isSet;
         }
 
-        public void resetSoft() {
-            isSet = false;
-        }
     }
 
     protected LookupTable lut;
@@ -78,6 +83,7 @@ public class Component {
     protected Map<String,Component> ins;
     protected Map<String,Component> outs;
     protected Cache outputCache;
+    protected Cache inputCache;
 
     protected boolean evaluating;
     protected boolean needsForward;
@@ -99,6 +105,7 @@ public class Component {
         ins = new TreeMap<>();
         outs = new TreeMap<>();
         outputCache = new Cache(outputs);
+        inputCache = new Cache(inputs);
         evaluating = false;
         needsForward = false;
     }
@@ -128,8 +135,10 @@ public class Component {
         // need to evaluate for the cache
         List<String> evalInputs = new LinkedList<>();
         for (String input : ins.keySet()) {
-            if (ins.get(input).eval(input))
+            if (ins.get(input).eval(input)) {
                 evalInputs.add(input);
+                inputCache.setValue(input,true);
+            }
         }
 
         // eval stuff saved here
@@ -157,8 +166,21 @@ public class Component {
         return outputCache.get(output);
     }
 
+    public void propagateForward(Component from, String output) throws InvalidParamException {
+        if (from.equals(this)) {
+            // compare to the input cache
+        }
+        evalImpl();
+    }
+
 
 }
+
+// TODO
+// - unit tests for cache -> store, clear, softClear ...
+// - store outbound components in Wire 
+// - override propagateForward in Wire
+// - implement propagateForward following the rules
 
 
 /*
