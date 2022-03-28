@@ -19,4 +19,8 @@ public class Output extends Component {
     public Output clone() {
         return new Output();
     }
+
+    public boolean eval() throws InvalidParamException {
+        return super.eval("out");
+    }
 }
