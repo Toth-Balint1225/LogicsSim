@@ -81,7 +81,6 @@ public class Component {
     protected LookupTable lut;
 
     protected Map<String,Component> ins;
-    protected Map<String,Component> outs;
     protected Cache outputCache;
     protected Cache inputCache;
 
@@ -103,7 +102,6 @@ public class Component {
     protected void init(List<String> inputs, List<String> outputs) {
         lut = new LookupTable(inputs,outputs);
         ins = new TreeMap<>();
-        outs = new TreeMap<>();
         outputCache = new Cache(outputs);
         inputCache = new Cache(inputs);
         evaluating = false;
@@ -175,6 +173,7 @@ public class Component {
 
 
 }
+
 
 // TODO
 // - unit tests for cache -> store, clear, softClear ...
