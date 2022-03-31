@@ -128,6 +128,10 @@ public class Component {
         return c;
     }
 
+    public void reset() {
+        outputCache.clear();
+    }
+
     // this is meant to eval every output's value and put them into AR CAC'HE
     protected void evalImpl() throws InvalidParamException {
         // need to evaluate for the cache

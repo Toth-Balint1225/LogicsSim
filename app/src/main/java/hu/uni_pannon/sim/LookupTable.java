@@ -180,6 +180,14 @@ public class LookupTable {
         return 0;
     }
 
+    public void invert() {
+        for (int i=0;i<rows;i++) {
+            for (int j=0;j<outN;j++) {
+                outputTable[i][j] = true;
+            }
+        }
+    }
+
     public LookupTable clone() {
         LookupTable lut = new LookupTable();
         lut.setTable(inputTable.clone(),outputTable.clone());

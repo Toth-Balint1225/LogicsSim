@@ -5,6 +5,8 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import hu.uni_pannon.sim.gates.AndGate;
+
 public class CircuitTest {
     @Test
     public void simpleCircuit() {
