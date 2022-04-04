@@ -5,8 +5,17 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * The lookup table is the core functionallity of a combinational network. This implementation
+ * stores the inputs and outputs in separate matrices. The inputs represent all the possible 
+ * combinations of the input variables.
+ * @author Tóth Bálint 
+ */
 public class LookupTable {
     
+    /**
+     * Storage mapping for the labels.
+     */
     private Map<String,Integer> inputIndexes;
     private Map<String,Integer> outputIndexes;
     
@@ -22,6 +31,13 @@ public class LookupTable {
     private LookupTable() {
     }
 
+    /**
+     * Constructs a lookup table from the inputs and outputs.
+     * The inputs get generated with all combinations, and the
+     * outputs are filled up with false values.
+     * @param inputLabels the label set of the inputs
+     * @param outputLabels label set of the outputs
+     */
     public LookupTable(List<String> inputLabels, List<String> outputLabels) {
         this.inN = inputLabels.size();
         this.outN = outputLabels.size();
@@ -45,6 +61,11 @@ public class LookupTable {
         genTables();
     }
 
+    /**
+     * Used for cloning and copying
+     * @param inputTable the table we want to copy
+     * @param outputTable the table we want to copy
+     */
     private void setTable(boolean[][] inputTable, boolean[][] outputTable) {
         this.inputTable = inputTable;
         this.outputTable = outputTable;
@@ -130,6 +151,13 @@ public class LookupTable {
             outputTable[idx][outputIndexes.get(o)] = true;
     }
 
+    /**
+     * Used to add an entry to the lookup table. An entry is a list of pins (combination of inputs) that the
+     * mapping should equate to a logical true.
+     * @param inputs combination of inputs.
+     * @param outputs outputs to be set to true
+     * @throws InvalidParamException
+     */
     public void nullEntry(List<String> inputs, List<String> outputs) throws InvalidParamException {
         if (outputs.size() == 0) {
             throw new InvalidParamException("No output parameter specified");
