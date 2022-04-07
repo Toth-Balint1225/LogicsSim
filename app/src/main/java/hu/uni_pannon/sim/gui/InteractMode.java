@@ -4,12 +4,18 @@ import javafx.scene.input.MouseEvent;
 
 public class InteractMode implements Mode {
 
+
+
     @Override
-    public void handlePress(GraphicalObject obj, MouseEvent evt) {
-        obj.interact();    
+    public void handlePress(String id, MouseEvent evt, MainView controller) {
+        if (id.equals(controller.getBackgroundId())) 
+            return;
+        if (evt.isPrimaryButtonDown()) {
+            controller.interact(id);
+        }
     }
 
     @Override
-    public void handleDrag(GraphicalObject obj, MouseEvent evt) {}
+    public void handleDrag(String id, MouseEvent evt, MainView controller) {}
     
 }

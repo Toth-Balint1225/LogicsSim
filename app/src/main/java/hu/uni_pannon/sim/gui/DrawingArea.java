@@ -1,8 +1,8 @@
 package hu.uni_pannon.sim.gui;
 
-import java.util.LinkedList;
-import java.util.List;
 
+import java.util.Map;
+import java.util.TreeMap;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -15,53 +15,31 @@ public class DrawingArea extends Group {
     private DoubleProperty widthProperty;
     private DoubleProperty heightProperty;
 
-    private List<Group> objs;
     private Rectangle background;
+    private String backgroundId;
 
-    Mode currentMode;
+    private MainView controller;
+    private Map<String,GraphicalObject> objs;
 
-    public DrawingArea() {
+
+    public DrawingArea(String id, MainView controller) {
+        this.controller = controller;
+        objs = new TreeMap<>();
+        backgroundId = id;
+        // init
         widthProperty = new SimpleDoubleProperty();
         heightProperty = new SimpleDoubleProperty();
-        objs = new LinkedList<>();
         background = new Rectangle();
-        currentMode = new InteractMode();
         getChildren().add(background);
         background.widthProperty().bind(widthProperty);
         background.heightProperty().bind(heightProperty);      
         background.setFill(Color.WHITE);
+
         background.addEventFilter(MouseEvent.MOUSE_PRESSED,
             (final MouseEvent mouseEvent) -> {
-                if (mouseEvent.isSecondaryButtonDown()) {
-                    spawnObject(mouseEvent.getX(), mouseEvent.getY());
-                }
+                controller.notifyPress(backgroundId,mouseEvent);
             });
-    }
 
-    public void setModeToMove() {
-        currentMode = new MoveMode();
-    }
-
-    public void setModeToInteract() {
-        currentMode = new InteractMode();
-    }
-
-    public void setModeToPlace() {
-        currentMode = new PlaceMode();
-    }
-
-    public void notifyPress(GraphicalObject obj, MouseEvent event) {
-        currentMode.handlePress(obj,event);
-    }
-
-    public void notifyDrag(GraphicalObject obj, MouseEvent event) {
-        currentMode.handleDrag(obj,event);
-    }
-
-    private void spawnObject(double x, double y) {
-        GraphicalObject go = new GraphicalObject(x,y,this);
-        objs.add(go);
-        getChildren().add(go);
     }
 
     public DoubleProperty widthProperty() {
@@ -70,6 +48,15 @@ public class DrawingArea extends Group {
 
     public DoubleProperty heightProperty() {
         return heightProperty;
+    }
+
+    public void addObject(GraphicalObject o) {
+        getChildren().add(o);
+        objs.put(o.getID(),o);
+    }
+
+    public GraphicalObject getObjectById(String id) {
+        return objs.get(id);
     }
 
 }

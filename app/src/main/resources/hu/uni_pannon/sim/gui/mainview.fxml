@@ -56,9 +56,9 @@
             </MenuBar>
             <ToolBar prefHeight="40.0" prefWidth="200.0">
               <items>
-                <Button fx:id="interactButton" mnemonicParsing="false" text="Interact" />
-                  <Button id="moveButton" fx:id="moveButton" mnemonicParsing="false" text="Move" />
-                  <Button id="placeButton" fx:id="placeButton" mnemonicParsing="false" text="Place" />
+                <Button fx:id="interactButton" mnemonicParsing="false" onAction="#onInteractButtonClicked" text="Interact" />
+                  <Button id="moveButton" fx:id="moveButton" mnemonicParsing="false" onAction="#onMoveButtonClicked" text="Move" />
+                  <Button id="placeButton" fx:id="placeButton" mnemonicParsing="false" onAction="#onPlaceButtonClicked" text="Place" />
               </items>
             </ToolBar>
          </children>

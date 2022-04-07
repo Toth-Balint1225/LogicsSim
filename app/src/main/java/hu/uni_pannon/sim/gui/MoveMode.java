@@ -5,11 +5,15 @@ import javafx.scene.input.MouseEvent;
 public class MoveMode implements Mode {
 
     @Override
-    public void handlePress(GraphicalObject obj, MouseEvent evt) {
+    public void handlePress(String id, MouseEvent evt, MainView controller) {
+        // TODO Auto-generated method stub
+        
     }
 
     @Override
-    public void handleDrag(GraphicalObject obj, MouseEvent evt) {
+    public void handleDrag(String id, MouseEvent evt, MainView controller) {
+        // TODO Auto-generated method stub
+        
     }
     
 }
