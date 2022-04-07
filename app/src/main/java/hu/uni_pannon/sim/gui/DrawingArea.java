@@ -18,13 +18,14 @@ public class DrawingArea extends Group {
     private List<Group> objs;
     private Rectangle background;
 
-    private Connector conn = null;
+    Mode currentMode;
 
     public DrawingArea() {
         widthProperty = new SimpleDoubleProperty();
         heightProperty = new SimpleDoubleProperty();
         objs = new LinkedList<>();
         background = new Rectangle();
+        currentMode = new InteractMode();
         getChildren().add(background);
         background.widthProperty().bind(widthProperty);
         background.heightProperty().bind(heightProperty);      
@@ -35,6 +36,26 @@ public class DrawingArea extends Group {
                     spawnObject(mouseEvent.getX(), mouseEvent.getY());
                 }
             });
+    }
+
+    public void setModeToMove() {
+        currentMode = new MoveMode();
+    }
+
+    public void setModeToInteract() {
+        currentMode = new InteractMode();
+    }
+
+    public void setModeToPlace() {
+        currentMode = new PlaceMode();
+    }
+
+    public void notifyPress(GraphicalObject obj, MouseEvent event) {
+        currentMode.handlePress(obj,event);
+    }
+
+    public void notifyDrag(GraphicalObject obj, MouseEvent event) {
+        currentMode.handleDrag(obj,event);
     }
 
     private void spawnObject(double x, double y) {
@@ -49,17 +70,6 @@ public class DrawingArea extends Group {
 
     public DoubleProperty heightProperty() {
         return heightProperty;
-    }
-
-    public void notifyConnect(GraphicalObject c) {
-        if (conn == null) {
-            conn = new Connector();
-            conn.anchorStart(c);
-        } else {
-            conn.anchorEnd(c);
-            getChildren().add(conn);
-            conn = null;
-        }
     }
 
 }

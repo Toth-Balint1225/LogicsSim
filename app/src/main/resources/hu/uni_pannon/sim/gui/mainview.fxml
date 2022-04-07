@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="666.0" prefWidth="960.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="666.0" prefWidth="960.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="hu.uni_pannon.sim.gui.MainView">
    <bottom>
       <HBox prefHeight="15.0" prefWidth="600.0" BorderPane.alignment="CENTER" />
    </bottom>
@@ -56,7 +56,9 @@
             </MenuBar>
             <ToolBar prefHeight="40.0" prefWidth="200.0">
               <items>
-                <Button mnemonicParsing="false" text="Button" />
+                <Button fx:id="interactButton" mnemonicParsing="false" text="Interact" />
+                  <Button id="moveButton" fx:id="moveButton" mnemonicParsing="false" text="Move" />
+                  <Button id="placeButton" fx:id="placeButton" mnemonicParsing="false" text="Place" />
               </items>
             </ToolBar>
          </children>
@@ -65,7 +67,7 @@
    <center>
       <ScrollPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <content>
-            <Pane prefHeight="1500.0" prefWidth="1500.0" />
+            <Pane fx:id="workPlacePane" prefHeight="1500.0" prefWidth="1500.0" />
          </content>
       </ScrollPane>
    </center>
