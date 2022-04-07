@@ -1,10 +1,10 @@
-package hu.uni_pannon.sim.gates;
+package hu.uni_pannon.sim.logic.gates;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 
-import hu.uni_pannon.sim.Component;
-import hu.uni_pannon.sim.InvalidParamException;
+import hu.uni_pannon.sim.logic.Component;
+import hu.uni_pannon.sim.logic.InvalidParamException;
 
 public class XnorGate extends Component {
     

@@ -1,4 +1,4 @@
-package hu.uni_pannon.sim;
+package hu.uni_pannon.sim.logic;
 
 
 /**

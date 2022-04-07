@@ -5,7 +5,12 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import hu.uni_pannon.sim.gates.AndGate;
+import hu.uni_pannon.sim.logic.Circuit;
+import hu.uni_pannon.sim.logic.Input;
+import hu.uni_pannon.sim.logic.InvalidParamException;
+import hu.uni_pannon.sim.logic.Output;
+import hu.uni_pannon.sim.logic.Wire;
+import hu.uni_pannon.sim.logic.gates.AndGate;
 
 public class CircuitTest {
     @Test

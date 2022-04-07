@@ -9,6 +9,10 @@ import java.util.Arrays;
 
 import org.junit.Test;
 
+import hu.uni_pannon.sim.logic.Component;
+import hu.uni_pannon.sim.logic.InvalidParamException;
+import hu.uni_pannon.sim.logic.LookupTable;
+
 public class LookupTableTest {
     
     @Test
