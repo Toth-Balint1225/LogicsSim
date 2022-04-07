@@ -6,6 +6,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.control.ScrollPane;
 import javafx.stage.Stage;
 
 public class App extends Application {
@@ -18,14 +19,14 @@ public class App extends Application {
     public void start(Stage primaryStage) throws Exception {
         primaryStage.setTitle("Logic Simulator");
         BorderPane root = FXMLLoader.load(App.class.getResource("app.fxml"));
-        Pane container = (Pane)root.getCenter();
+        Pane container = (Pane)((ScrollPane)root.getCenter()).contentProperty().get();
         DrawingArea da = new DrawingArea();
         da.widthProperty().bind(container.widthProperty());
         da.heightProperty().bind(container.heightProperty());
         container.getChildren().add(da);
-        primaryStage.setScene(new Scene(root,640,480));
-        // temporary, needs fix: drawing area and the circuit behind it
-        primaryStage.setMaximized(true);
+        primaryStage.setScene(new Scene(root));
+        primaryStage.sizeToScene();
+        //primaryStage.setMaximized(true);
         primaryStage.show();
     }
 }
