@@ -55,6 +55,13 @@ public class DrawingArea extends Group {
         objs.put(o.getID(),o);
     }
 
+    public void removeObject(String id) {
+        // TODO: handle incorrect id
+        GraphicalObject obj = objs.get(id);
+        getChildren().remove(obj);
+        objs.remove(id);
+    }
+
     public GraphicalObject getObjectById(String id) {
         return objs.get(id);
     }

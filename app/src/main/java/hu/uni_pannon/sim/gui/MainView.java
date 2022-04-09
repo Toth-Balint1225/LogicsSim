@@ -59,6 +59,7 @@ public class MainView {
 
     @FXML
     public void onPlaceButtonClicked(Event e) {
+        // TODO: get the selected component from the harmonica
         mode = new PlaceMode();
     }
 
@@ -69,6 +70,11 @@ public class MainView {
         // add to the view
         GraphicalObject obj = new GraphicalObject(id,this,x,y);
         da.addObject(obj);
+    }
+
+    public void removeObject(String id) {
+        model.remove(id);
+        da.removeObject(id);
     }
 
     public void notifyPress(String id, MouseEvent event) {
