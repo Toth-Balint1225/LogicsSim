@@ -4,6 +4,8 @@ import static org.junit.Assert.assertThrows;
 
 import org.junit.Test;
 
+import hu.uni_pannon.sim.gates.AndGate;
+
 public class WireTest {
     
     @Test

@@ -8,6 +8,8 @@ import java.util.Arrays;
 
 import org.junit.Test;
 
+import hu.uni_pannon.sim.gates.AndGate;
+
 public class AppTest {
     
     @Test

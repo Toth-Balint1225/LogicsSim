@@ -1,21 +1,25 @@
-package hu.uni_pannon.sim;
+package hu.uni_pannon.sim.gates;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 
-public class AndGate extends Component {
+import hu.uni_pannon.sim.Component;
+import hu.uni_pannon.sim.InvalidParamException;
 
+public class XnorGate extends Component {
+    
     int pinNum;
 
-    public AndGate(int inPinNum) {
+    public XnorGate(int inPinNum) {
         this.pinNum = inPinNum;
         LinkedList<String> pins = new LinkedList<>();
         for (int i=0;i<inPinNum;i++) {
             pins.add(String.format("x%d",i));
         }
-        init(pins,Arrays.asList("and"));
+        init(pins,Arrays.asList("xnor"));
         try {
-            lut.addEntry(pins,Arrays.asList("and"));
+            lut.addEntry(Arrays.asList(),Arrays.asList("xnor"));
+            lut.addEntry(pins,Arrays.asList("xnor"));
         } catch (InvalidParamException ex) {
             System.err.println("Component init error");
             ex.printStackTrace();
@@ -24,8 +28,8 @@ public class AndGate extends Component {
     }
 
     @Override
-    public AndGate clone() {
-        return new AndGate(pinNum);
+    public XnorGate clone() {
+        return new XnorGate(pinNum);
     }
     
 }
