@@ -6,13 +6,16 @@ public class MoveMode implements Mode {
 
     @Override
     public void handlePress(String id, MouseEvent evt, MainView controller) {
-        //controller.getDrawingArea().getObjectById("id").move(evt.getX(),evt.getY());
+        if (id.equals(controller.getBackgroundId()))
+            return;
+        controller.getDrawingArea().getObjectById(id).moveStart(evt.getSceneX(),evt.getSceneY());
     }
 
     @Override
     public void handleDrag(String id, MouseEvent evt, MainView controller) {
-        // TODO Auto-generated method stub
-        
+        if (id.equals(controller.getBackgroundId()))
+            return;
+        controller.getDrawingArea().getObjectById(id).moveDrag(evt.getSceneX(), evt.getSceneY());
     }
     
 }

@@ -10,17 +10,23 @@ import javafx.scene.shape.Circle;
 
 public class GraphicalObject extends Group {
 
+    private class Pos {
+        public double x, y;
+    }
+
     private DoubleProperty xProperty;
     private DoubleProperty yProperty;
 
-    String id;
-    MainView controller;
+    private String id;
+    private MainView controller;
 
-    private
+    private Pos lastPos;
 
     // debug purposes
-    Circle c;
+    private Circle c;
+
     public GraphicalObject(String id, MainView controller, double x, double y) {
+        lastPos = new Pos();
         this.id = id;
         this.controller = controller;
         xProperty = new SimpleDoubleProperty(x);
@@ -69,8 +75,20 @@ public class GraphicalObject extends Group {
 
     }
 
-    public void move(double x, double y) {
+    public void moveStart(double x, double y) {
+        lastPos.x = x;
+        lastPos.y = y;
+    }
 
+    public void moveDrag(double x, double y) {
+        double dx = x - lastPos.x;
+        double dy = y - lastPos.y;
+
+        xProperty.set(xProperty.get() + dx);
+        yProperty.set(yProperty.get() + dy);
+
+        lastPos.x = x;
+        lastPos.y = y;
     }
 
 }
