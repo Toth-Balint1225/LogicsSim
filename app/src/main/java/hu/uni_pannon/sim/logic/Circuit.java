@@ -33,6 +33,15 @@ public class Circuit {
     }
 
     /**
+     * Interface function, deletes the component with the given id.
+     * @param id component to be removed
+     * TODO: check id correctness
+     */
+    public void remove(String id) {
+        components.remove(id);
+    }
+
+    /**
      * Interface function, used to query a component based on its identifier.
      * TODO: check for id correctness and throw an InvalidParamException
      * @param id the id of the compontent to be queried.

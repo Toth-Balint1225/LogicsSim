@@ -11,9 +11,13 @@ public class PlaceMode implements Mode {
 
     @Override
     public void handlePress(String id, MouseEvent evt, MainView controller) {
-        if (id == controller.getBackgroundId() && evt.isPrimaryButtonDown()) {
+        if (id.equals(controller.getBackgroundId()) && evt.isPrimaryButtonDown()) {
             activeComponent = new Component(Arrays.asList("a", "b"), Arrays.asList("out"));
             controller.spawnComponent(activeComponent, evt.getX(),evt.getY());
+            return;
+        }
+        if (!id.equals(controller.getBackgroundId()) && evt.isSecondaryButtonDown()) {
+            controller.removeObject(id);
         }
     }
 

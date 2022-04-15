@@ -20,8 +20,10 @@ public class MainView {
     @FXML
     private Pane workPlacePane;
 
+    // reference to view
     private DrawingArea da;
 
+    // reference to model
     private Circuit model;
 
     private Mode mode;
@@ -59,16 +61,23 @@ public class MainView {
 
     @FXML
     public void onPlaceButtonClicked(Event e) {
+        // TODO: get the selected component from the harmonica
+        // mayB start a dialog configurer panel
         mode = new PlaceMode();
     }
 
     public void spawnComponent(Component c, double x, double y) {
-        // add to the model
+        // add to the model (VERY TEMPORARY)
         String id = "component"+MainView.getComponentNum();
         model.add(id,c);
         // add to the view
         GraphicalObject obj = new GraphicalObject(id,this,x,y);
         da.addObject(obj);
+    }
+
+    public void removeObject(String id) {
+        model.remove(id);
+        da.removeObject(id);
     }
 
     public void notifyPress(String id, MouseEvent event) {
@@ -85,5 +94,9 @@ public class MainView {
 
     public void interact(String id) {
         da.getObjectById(id).interact();
+    }
+
+    public DrawingArea getDrawingArea() {
+        return da;
     }
 }

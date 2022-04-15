@@ -6,8 +6,7 @@ public class MoveMode implements Mode {
 
     @Override
     public void handlePress(String id, MouseEvent evt, MainView controller) {
-        // TODO Auto-generated method stub
-        
+        //controller.getDrawingArea().getObjectById("id").move(evt.getX(),evt.getY());
     }
 
     @Override

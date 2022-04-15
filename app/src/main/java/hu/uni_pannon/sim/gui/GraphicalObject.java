@@ -16,6 +16,8 @@ public class GraphicalObject extends Group {
     String id;
     MainView controller;
 
+    private
+
     // debug purposes
     Circle c;
     public GraphicalObject(String id, MainView controller, double x, double y) {
@@ -64,6 +66,10 @@ public class GraphicalObject extends Group {
             c.setFill(Color.RED);
         else 
             c.setFill(Color.BLUE);
+
+    }
+
+    public void move(double x, double y) {
 
     }
 
