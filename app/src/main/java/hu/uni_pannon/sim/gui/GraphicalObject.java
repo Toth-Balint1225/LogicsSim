@@ -66,6 +66,7 @@ public class GraphicalObject extends Group {
         return yProperty;
     }
 
+    // Interact functionallity
     public void interact() { 
         // DEBUG
         if (c.getFill().equals(Color.BLUE))
@@ -75,6 +76,7 @@ public class GraphicalObject extends Group {
 
     }
 
+    // Move functionallity
     public void moveStart(double x, double y) {
         lastPos.x = x;
         lastPos.y = y;

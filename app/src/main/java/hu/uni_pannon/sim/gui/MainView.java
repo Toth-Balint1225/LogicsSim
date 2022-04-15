@@ -38,7 +38,7 @@ public class MainView {
 
     public MainView() {
         model = new Circuit();
-        mode = new InteractMode();
+        mode = new InteractMode(this);
     }
 
     @FXML
@@ -51,19 +51,19 @@ public class MainView {
     
     @FXML
     public void onInteractButtonClicked(Event e) {
-        mode = new InteractMode();
+        mode = new InteractMode(this);
     }
 
     @FXML
     public void onMoveButtonClicked(Event e) {
-        mode = new MoveMode();
+        mode = new MoveMode(this);
     }
 
     @FXML
     public void onPlaceButtonClicked(Event e) {
         // TODO: get the selected component from the harmonica
         // mayB start a dialog configurer panel
-        mode = new PlaceMode();
+        mode = new PlaceMode(this);
     }
 
     public void spawnComponent(Component c, double x, double y) {
@@ -81,19 +81,15 @@ public class MainView {
     }
 
     public void notifyPress(String id, MouseEvent event) {
-        mode.handlePress(id,event,this);
+        mode.handlePress(id,event);
     }
 
     public void notifyDrag(String id, MouseEvent event) {
-        mode.handleDrag(id, event,this);
+        mode.handleDrag(id, event);
     }
 
     public final String getBackgroundId() {
         return BACKGROUND;
-    }
-
-    public void interact(String id) {
-        da.getObjectById(id).interact();
     }
 
     public DrawingArea getDrawingArea() {

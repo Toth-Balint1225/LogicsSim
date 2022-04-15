@@ -7,10 +7,16 @@ import javafx.scene.input.MouseEvent;
 
 public class PlaceMode implements Mode {
 
-    Component activeComponent;
+    private Component activeComponent;
+
+    private MainView controller;
+
+    public PlaceMode(MainView controller) {
+        this.controller = controller;
+    }
 
     @Override
-    public void handlePress(String id, MouseEvent evt, MainView controller) {
+    public void handlePress(String id, MouseEvent evt) {
         if (id.equals(controller.getBackgroundId()) && evt.isPrimaryButtonDown()) {
             activeComponent = new Component(Arrays.asList("a", "b"), Arrays.asList("out"));
             controller.spawnComponent(activeComponent, evt.getX(),evt.getY());
@@ -22,6 +28,6 @@ public class PlaceMode implements Mode {
     }
 
     @Override
-    public void handleDrag(String id, MouseEvent evt, MainView controller) {}
+    public void handleDrag(String id, MouseEvent evt) {}
     
 }
