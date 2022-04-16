@@ -3,6 +3,7 @@ package hu.uni_pannon.sim.gui;
 
 import hu.uni_pannon.sim.logic.Circuit;
 import hu.uni_pannon.sim.logic.Component;
+import hu.uni_pannon.sim.logic.Wire;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -10,6 +11,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 
 public class MainView {
+
+    private final String BACKGROUND = "background";
 
     @FXML
     private Button interactButton;
@@ -28,7 +31,6 @@ public class MainView {
 
     private Mode mode;
 
-    private final String BACKGROUND = "background";
 
     private static int componentNum = 0;
 
@@ -71,11 +73,28 @@ public class MainView {
         String id = "component"+MainView.getComponentNum();
         model.add(id,c);
         // add to the view
+        // important: always add the graphical after the model, cause the 
+        // graphical needs the model
         GraphicalObject obj = new GraphicalObject(id,this,x,y);
         da.addObject(obj);
     }
 
+    public String spawnWire(Component w, String component) {
+        String id = "wire"+MainView.getComponentNum();
+        hu.uni_pannon.sim.gui.Wire obj = new hu.uni_pannon.sim.gui.Wire(id,this);
+        model.add(id,w);
+        da.addObject(obj);
+        obj.anchorStart(da.getObjectById(component));
+        return id;
+    }
+
     public void removeObject(String id) {
+        if (model.getComponentById(id) instanceof Wire) {
+            // special case
+            // TODO: handle wire deletion
+            return;
+        }
+        // TODO: also handle its connections and wires
         model.remove(id);
         da.removeObject(id);
     }
@@ -94,5 +113,9 @@ public class MainView {
 
     public DrawingArea getDrawingArea() {
         return da;
+    }
+
+    public Circuit getModel() {
+        return model;
     }
 }

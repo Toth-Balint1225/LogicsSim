@@ -37,7 +37,7 @@ public class DrawingArea extends Group {
 
         background.addEventFilter(MouseEvent.MOUSE_PRESSED,
             (final MouseEvent mouseEvent) -> {
-                controller.notifyPress(backgroundId,mouseEvent);
+                this.controller.notifyPress(backgroundId,mouseEvent);
             });
 
     }
