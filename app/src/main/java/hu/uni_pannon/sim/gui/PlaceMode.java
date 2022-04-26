@@ -44,23 +44,21 @@ public class PlaceMode implements Mode {
                 // first part of the connection: 
                 // create the wire object and pass it to the controller
                 // at this point we also know the component and the pin of the start
-                Component w = new Wire();
+                Wire w = new Wire();
                 this.wireID = controller.spawnWire(w,id);
                 connecting = true;
-                controller.getDrawingArea().getObjectById(id).clearActivePin();
+                GraphicalObject active = controller.getDrawingArea().getObjectById(id);
+                w.from(active.getActivePinId(),controller.getModel().getComponentById(id));
+                active.clearActivePin();
             } else {
                 // second part of the connection
                 // at this part, id is of the endpoint
                 ((hu.uni_pannon.sim.gui.Wire)controller.getDrawingArea().getObjectById(wireID)).anchorEnd(
                     controller.getDrawingArea().getObjectById(id));
-                    controller.getDrawingArea().getObjectById(id).clearActivePin();
-                /*
-                try {
-                    ((Wire)controller.getModel().getComponentById(wireID)).connect("",null,"",null);
-                } catch (InvalidParamException e) {
-                    e.printStackTrace();
-                }
-                */
+                Wire w = (Wire)controller.getModel().getComponentById(wireID);
+                GraphicalObject active = controller.getDrawingArea().getObjectById(id);
+                w.to(active.getActivePinId(),controller.getModel().getComponentById(id));
+                active.clearActivePin();
                 this.wireID = null;
                 connecting = false;
             }

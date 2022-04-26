@@ -61,6 +61,16 @@ public class Wire extends Component {
         return this;
     }
 
+    public Wire from(String inId, Component in) {
+        addInput(inId,in);
+        return this;
+    }
+
+    public Wire to(String outId, Component out) {
+        out.addInput(outId, this);
+        return this;
+    }
+
     /**
      * Implementation of the clone design pattern: returns an identical copy of itself.
      */

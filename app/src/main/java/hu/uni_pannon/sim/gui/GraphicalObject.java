@@ -28,7 +28,6 @@ public class GraphicalObject extends Group {
 
     // debug purposes
     Rectangle rect;
-    Circle c1,c2,c3;
 
     boolean interacted = false;
 
@@ -87,14 +86,11 @@ public class GraphicalObject extends Group {
         yProperty = new SimpleDoubleProperty(y);
         // debug
             rect = new Rectangle();
-            c1 = new Circle();
-            c2 = new Circle();
-            c3 = new Circle();
             rect.setWidth(50);
             rect.setHeight(80);
             rect.xProperty().bind(xProperty.subtract(25));
             rect.yProperty().bind(yProperty.subtract(40));
-            getChildren().addAll(rect,c1,c2,c3);
+            getChildren().addAll(rect);
         addEventFilters();
         addPins();
     }
@@ -129,6 +125,10 @@ public class GraphicalObject extends Group {
         activePinId = null;
     }
 
+    public String getActivePinId() {
+        return activePinId;
+    }
+
     private void addEventFilters() {
         // TEMP hopefully
         rect.addEventFilter(MouseEvent.MOUSE_PRESSED,
@@ -159,14 +159,8 @@ public class GraphicalObject extends Group {
     public void interact() {
         if (interacted) {
             rect.setFill(Color.BLACK);
-            c1.setFill(Color.BLACK);
-            c2.setFill(Color.BLACK);
-            c3.setFill(Color.BLACK);
         } else {
             rect.setFill(Color.RED);
-            c1.setFill(Color.RED);
-            c2.setFill(Color.RED);
-            c3.setFill(Color.RED);
         }
         interacted = !interacted;
     }
@@ -191,7 +185,7 @@ public class GraphicalObject extends Group {
     // connect functionallity
     public void anchorWire(DoubleProperty x, DoubleProperty y) {
         Pin p = pins.get(activePinId);
-        activePinId = null;
+        //activePinId = null;
         x.bind(p.xProperty());
         y.bind(p.yProperty());
     }
