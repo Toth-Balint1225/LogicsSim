@@ -3,16 +3,28 @@ package hu.uni_pannon.sim.gui;
 
 import hu.uni_pannon.sim.logic.Circuit;
 import hu.uni_pannon.sim.logic.Component;
+import hu.uni_pannon.sim.logic.InvalidParamException;
 import hu.uni_pannon.sim.logic.Wire;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.ListView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 
 public class MainView {
 
     private final String BACKGROUND = "background";
+
+    public static class Gate {
+        public static final String input = "INPUT";
+        public static final String output = "OUTPUT"; 
+        public static final String and = "AND"; 
+        public static final String or = "OR"; 
+        public static final String not = "NOT";
+    }
 
     @FXML
     private Button interactButton;
@@ -22,6 +34,10 @@ public class MainView {
     private Button placeButton;
     @FXML
     private Pane workPlacePane;
+
+    @FXML
+    private ListView<String> componentSelectorListView;
+
 
     // reference to view
     private DrawingArea da;
@@ -49,6 +65,12 @@ public class MainView {
         da.widthProperty().bind(workPlacePane.widthProperty());
         da.heightProperty().bind(workPlacePane.heightProperty());
         workPlacePane.getChildren().add(da);
+
+        // fill up the lists
+        ObservableList<String> componentItems = FXCollections.observableArrayList(
+            Gate.input, Gate.output, Gate.and, Gate.or, Gate.not
+        );
+        componentSelectorListView.setItems(componentItems);
     }
     
     @FXML
@@ -117,5 +139,49 @@ public class MainView {
 
     public Circuit getModel() {
         return model;
+    }
+    
+    public ObservableList<String> getComponentList() {
+        return componentSelectorListView.getItems();
+    }
+
+    /**
+     * Factory method for object creation
+     * @return
+     */
+    public Component generateComponent() {
+        String id = componentSelectorListView.getSelectionModel().getSelectedItem();
+        Component c = null;
+        switch (id) {
+            case Gate.input:
+                c = new hu.uni_pannon.sim.logic.Input();
+                break;
+            case Gate.output:
+                c = new hu.uni_pannon.sim.logic.Output();
+                break;
+            case Gate.and:
+                c = new hu.uni_pannon.sim.logic.gates.AndGate(2);
+                break;
+            case Gate.or:
+                c = new hu.uni_pannon.sim.logic.gates.OrGate(2);
+                break;
+            case Gate.not:
+                c = new hu.uni_pannon.sim.logic.gates.NotGate();
+                break;
+            default:
+                c = new hu.uni_pannon.sim.logic.gates.AndGate(2);
+                break;
+        }
+        return c;
+    }
+
+    public void evaluate() {
+        try {
+            model.clear();
+            model.evaluate();
+        } catch (InvalidParamException e) {
+            e.printStackTrace();
+        }
+        da.updateView(); 
     }
 }

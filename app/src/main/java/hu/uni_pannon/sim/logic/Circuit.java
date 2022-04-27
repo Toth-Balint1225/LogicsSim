@@ -66,4 +66,9 @@ public class Circuit {
         }
     }
 
+    public void clear() {
+        for (Map.Entry<String,Component> entry : components.entrySet()) {
+            entry.getValue().reset();
+        }
+    }
 }

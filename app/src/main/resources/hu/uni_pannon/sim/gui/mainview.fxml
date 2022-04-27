@@ -2,6 +2,7 @@
 
 <?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
@@ -22,8 +23,11 @@
          <children>
             <Accordion>
               <panes>
-                <TitledPane animated="false" text="untitled 1" />
-                <TitledPane animated="false" text="untitled 2" />
+                <TitledPane animated="false" text="Input/Output">
+                     <content>
+                        <ListView fx:id="componentSelectorListView" prefHeight="200.0" prefWidth="200.0" />
+                     </content></TitledPane>
+                <TitledPane animated="false" text="Logic gates" />
               </panes>
             </Accordion>
          </children>

@@ -27,7 +27,7 @@ public class PlaceMode implements Mode {
         // spawining
         if (id.equals(controller.getBackgroundId()) && evt.isPrimaryButtonDown()) {
             // DEBUG
-            activeComponent = new AndGate(2);
+            activeComponent = controller.generateComponent();
             controller.spawnComponent(activeComponent, evt.getX(),evt.getY());
             return;
         }

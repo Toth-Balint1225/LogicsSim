@@ -4,6 +4,8 @@ package hu.uni_pannon.sim.gui;
 import java.util.Map;
 import java.util.TreeMap;
 
+import hu.uni_pannon.sim.logic.Component;
+import hu.uni_pannon.sim.logic.InvalidParamException;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.Group;
@@ -64,6 +66,20 @@ public class DrawingArea extends Group {
 
     public GraphicalObject getObjectById(String id) {
         return objs.get(id);
+    }
+
+    public void updateView() {
+        for (Map.Entry<String,GraphicalObject> obj : objs.entrySet()) {
+            Component c = controller.getModel().getComponentById(obj.getKey());
+            if (c instanceof hu.uni_pannon.sim.logic.Output) {
+                try {
+                    boolean value = c.eval("out");
+                    obj.getValue().setState(value);
+                } catch (InvalidParamException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
 }

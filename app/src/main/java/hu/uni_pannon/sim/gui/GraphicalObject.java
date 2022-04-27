@@ -4,6 +4,7 @@ package hu.uni_pannon.sim.gui;
 import java.util.Map;
 import java.util.TreeMap;
 
+import hu.uni_pannon.sim.logic.Component;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.Group;
@@ -159,10 +160,25 @@ public class GraphicalObject extends Group {
     public void interact() {
         if (interacted) {
             rect.setFill(Color.BLACK);
+            Component c = controller.getModel().getComponentById(id);
+            if (c instanceof hu.uni_pannon.sim.logic.Input) {
+                ((hu.uni_pannon.sim.logic.Input)c).low();
+            }
         } else {
+            Component c = controller.getModel().getComponentById(id);
+            if (c instanceof hu.uni_pannon.sim.logic.Input) {
+                ((hu.uni_pannon.sim.logic.Input)c).high();
+            }
             rect.setFill(Color.RED);
         }
         interacted = !interacted;
+    }
+
+    public void setState(boolean val) {
+        if (val) 
+            rect.setFill(Color.RED);
+        else
+            rect.setFill(Color.BLACK);
     }
 
     // Move functionallity
