@@ -24,6 +24,11 @@ public class MainView {
         public static final String and = "AND"; 
         public static final String or = "OR"; 
         public static final String not = "NOT";
+        public static final String xor = "XOR";
+        public static final String nand = "NAND";
+        public static final String nor = "NOR";
+        public static final String xnor = "XNOR";
+
     }
 
     @FXML
@@ -68,7 +73,7 @@ public class MainView {
 
         // fill up the lists
         ObservableList<String> componentItems = FXCollections.observableArrayList(
-            Gate.input, Gate.output, Gate.and, Gate.or, Gate.not
+            Gate.input, Gate.output, Gate.and, Gate.or, Gate.not, Gate.xor, Gate.nand, Gate.nor, Gate.xnor
         );
         componentSelectorListView.setItems(componentItems);
     }
@@ -168,6 +173,18 @@ public class MainView {
                 break;
             case Gate.not:
                 c = new hu.uni_pannon.sim.logic.gates.NotGate();
+                break;
+            case Gate.xor:
+                c = new hu.uni_pannon.sim.logic.gates.XorGate(2);
+                break;
+            case Gate.nand:
+                c = new hu.uni_pannon.sim.logic.gates.NandGate(2);
+                break;
+            case Gate.nor:
+                c = new hu.uni_pannon.sim.logic.gates.NorGate(2);
+                break;
+            case Gate.xnor:
+                c = new hu.uni_pannon.sim.logic.gates.XnorGate(2);
                 break;
             default:
                 c = new hu.uni_pannon.sim.logic.gates.AndGate(2);
