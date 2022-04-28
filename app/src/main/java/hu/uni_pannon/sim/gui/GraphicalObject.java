@@ -5,16 +5,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import hu.uni_pannon.sim.logic.Component;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.scene.Group;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Text;
 
 public class GraphicalObject extends Group {
 
@@ -26,13 +31,11 @@ public class GraphicalObject extends Group {
     private DoubleProperty yProperty;
 
     private String id;
-    private String name;
+    private StringProperty name;
     private MainView controller;
 
     private Pos lastPos;
 
-    // debug purposes
-    Rectangle rect;
 
     boolean interacted = false;
 
@@ -81,16 +84,16 @@ public class GraphicalObject extends Group {
         public void anchorToObject(DoubleBinding x, DoubleBinding y, PinDirection direction) {
             switch (direction) {
             case LEFT:
-                xProperty.bind(x.subtract(len));
+                xProperty.bind(x.subtract(len + Body.getBorder()));
                 yProperty.bind(y);
                 l.startXProperty().bind(xProperty);
-                l.endXProperty().bind(xProperty.add(len));
+                l.endXProperty().bind(xProperty.add(len + Body.getBorder()));
                 break;
             case RIGHT:
-                xProperty.bind(x.add(len));
+                xProperty.bind(x.add(len + Body.getBorder()));
                 yProperty.bind(y);
                 l.startXProperty().bind(xProperty);
-                l.endXProperty().bind(xProperty.subtract(len));
+                l.endXProperty().bind(xProperty.subtract(len + Body.getBorder()));
                 break;
             }
         }
@@ -104,13 +107,92 @@ public class GraphicalObject extends Group {
         }
     }
 
+    private static class Body extends Group {
+        private DoubleProperty xProperty;
+        private DoubleProperty yProperty;
+        private DoubleProperty widthProperty;
+        private DoubleProperty heightProperty;
+        private Rectangle outer;
+        private Rectangle inner;
+        private Text label;
+
+        private static final int BORDER = 3;
+
+        public static final int getBorder() {
+            return BORDER;
+        }
+
+        public Body(DoubleProperty x, DoubleProperty y,DoubleProperty width, DoubleProperty height, StringProperty label) {
+            xProperty = new SimpleDoubleProperty();
+            yProperty = new SimpleDoubleProperty();
+            xProperty.bind(x);
+            yProperty.bind(y);
+
+            widthProperty = new SimpleDoubleProperty();
+            heightProperty = new SimpleDoubleProperty();
+            widthProperty.bind(width);
+            heightProperty.bind(height);
+
+            outer = new Rectangle();
+            inner = new Rectangle();
+
+            inner.xProperty().bind(xProperty.subtract(widthProperty.divide(2.0)));
+            inner.yProperty().bind(yProperty.subtract(heightProperty.divide(2.0)));
+            inner.widthProperty().bind(widthProperty);
+            inner.heightProperty().bind(heightProperty);
+
+            outer.xProperty().bind(xProperty.subtract(widthProperty.divide(2.0)).subtract(Body.getBorder()));
+            outer.yProperty().bind(yProperty.subtract(heightProperty.divide(2.0)).subtract(Body.getBorder()));
+            outer.widthProperty().bind(widthProperty.add(Body.getBorder()*2));
+            outer.heightProperty().bind(heightProperty.add(Body.getBorder()*2));
+
+            outer.setFill(Color.BLACK);
+            inner.setFill(Color.WHITE);
+
+            this.label = new Text();
+            this.label.textProperty().bind(label);
+            this.label.xProperty().bind(xProperty.subtract(this.label.getLayoutBounds().getWidth() / 2.0));
+            this.label.yProperty().bind(yProperty);
+
+            this.label.textProperty().addListener(new ChangeListener<String>() {
+                @Override
+                public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                    Body.this.label.xProperty().bind(xProperty.subtract(Body.this.label.getLayoutBounds().getWidth() / 2.0));
+                    
+                }
+            });
+
+            getChildren().addAll(outer, inner, this.label);
+        }
+
+        // public DoubleProperty xProperty() {
+        //     return xProperty;
+        // }
+
+        // public DoubleProperty yProperty() {
+        //     return yProperty;
+        // }
+
+        // public DoubleProperty widthProperty() {
+        //     return widthProperty;
+        // }
+
+        // public DoubleProperty heightProperty() {
+        //     return heightProperty;
+        // }
+
+        public void changeColor(Color c) {
+            inner.setFill(c);
+        }
+    }
+
     private Map<String,Pin> pins;
 
     private String activePinId;
 
     private DoubleProperty widthProperty;
     private DoubleProperty heightProperty;
-    private Group body;
+    private Body body;
 
     public GraphicalObject(String id, MainView controller) {
         this.id = id;
@@ -119,7 +201,7 @@ public class GraphicalObject extends Group {
 
     public GraphicalObject(String id, MainView controller, double x, double y) {
         this(id,controller);
-        name = "CMP";
+        name = new SimpleStringProperty("CMP");
         lastPos = new Pos();
         pins = new TreeMap<>();
         activePinId = null;
@@ -128,15 +210,8 @@ public class GraphicalObject extends Group {
         heightProperty = new SimpleDoubleProperty(100);
         widthProperty = new SimpleDoubleProperty(50);
 
-        body = new Group();
-        // debug
-            rect = new Rectangle();
-            // rect.setFill(Color.TRANSPARENT);
-            rect.widthProperty().bind(widthProperty);
-            rect.heightProperty().bind(heightProperty);
-            rect.xProperty().bind(xProperty.subtract(widthProperty.divide(2.0)));
-            rect.yProperty().bind(yProperty.subtract(heightProperty.divide(2.0)));
-            getChildren().addAll(rect);
+        body = new Body(xProperty,yProperty,widthProperty,heightProperty,name);
+        getChildren().addAll(body);
         addEventFilters();
         addPins();
     }
@@ -180,7 +255,8 @@ public class GraphicalObject extends Group {
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name.set(name);
+        // this.name.notifyAll();
     }
 
     public boolean isPinActive() {
@@ -197,7 +273,7 @@ public class GraphicalObject extends Group {
 
     private void addEventFilters() {
         // TEMP hopefully
-        rect.addEventFilter(MouseEvent.MOUSE_PRESSED,
+        body.addEventFilter(MouseEvent.MOUSE_PRESSED,
             (final MouseEvent mouseEvent) -> {
                 controller.notifyPress(id,mouseEvent);
             });
@@ -224,7 +300,7 @@ public class GraphicalObject extends Group {
     // Interact functionallity
     public void interact() {
         if (interacted) {
-            rect.setFill(Color.BLACK);
+            body.changeColor(Color.WHITE);
             Component c = controller.getModel().getComponentById(id);
             if (c instanceof hu.uni_pannon.sim.logic.Input) {
                 ((hu.uni_pannon.sim.logic.Input)c).low();
@@ -234,16 +310,16 @@ public class GraphicalObject extends Group {
             if (c instanceof hu.uni_pannon.sim.logic.Input) {
                 ((hu.uni_pannon.sim.logic.Input)c).high();
             }
-            rect.setFill(Color.RED);
+            body.changeColor(Color.BLUE);
         }
         interacted = !interacted;
     }
 
     public void setState(boolean val) {
         if (val) 
-            rect.setFill(Color.RED);
+            body.changeColor(Color.BLUE);
         else
-            rect.setFill(Color.BLACK);
+            body.changeColor(Color.WHITE);
     }
 
     // Move functionallity

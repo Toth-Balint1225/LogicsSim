@@ -98,6 +98,7 @@ public class MainView {
         // important: always add the graphical after the model, cause the 
         // graphical needs the model
         GraphicalObject obj = new GraphicalObject(id,this,x,y);
+        obj.setName(componentSelectorListView.getSelectionModel().getSelectedItem());
         da.addObject(obj);
     }
 

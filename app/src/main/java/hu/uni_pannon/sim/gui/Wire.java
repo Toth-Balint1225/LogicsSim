@@ -21,6 +21,7 @@ public class Wire extends GraphicalObject {
         endYProperty = new SimpleDoubleProperty();
 
         l  = new Line();
+        l.setStrokeWidth(3);
         l.startXProperty().bind(startXProperty);
         l.startYProperty().bind(startYProperty);
         l.endXProperty().bind(endXProperty);
