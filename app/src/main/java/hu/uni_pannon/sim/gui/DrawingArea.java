@@ -79,6 +79,10 @@ public class DrawingArea extends Group {
                     e.printStackTrace();
                 }
             }
+            if (c instanceof hu.uni_pannon.sim.logic.Wire) {
+                boolean value = ((hu.uni_pannon.sim.logic.Wire)c).getState();
+                obj.getValue().setState(value);
+            }
         }
     }
 

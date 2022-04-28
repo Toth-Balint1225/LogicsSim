@@ -2,6 +2,7 @@ package hu.uni_pannon.sim.gui;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 
 public class Wire extends GraphicalObject {
@@ -51,6 +52,14 @@ public class Wire extends GraphicalObject {
 
     public void anchorEnd(GraphicalObject obj) {
         obj.anchorWire(endXProperty, endYProperty);
+    }
+
+    @Override
+    public void setState(boolean val) {
+        if (val) 
+            l.setStroke(Color.BLUE);
+        else
+            l.setStroke(Color.BLACK);
     }
     
 }

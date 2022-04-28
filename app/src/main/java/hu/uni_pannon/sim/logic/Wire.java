@@ -71,6 +71,16 @@ public class Wire extends Component {
         return this;
     }
 
+    public boolean getState() {
+        boolean res  = false;
+        try {
+            res = in.eval(inId);
+        } catch (InvalidParamException e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
+
     /**
      * Implementation of the clone design pattern: returns an identical copy of itself.
      */

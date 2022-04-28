@@ -194,6 +194,9 @@ public class GraphicalObject extends Group {
     private DoubleProperty heightProperty;
     private Body body;
 
+    private final Color lowColor = Color.WHITE;
+    private final Color highColor = Color.BLUE;
+
     public GraphicalObject(String id, MainView controller) {
         this.id = id;
         this.controller = controller;
@@ -300,7 +303,7 @@ public class GraphicalObject extends Group {
     // Interact functionallity
     public void interact() {
         if (interacted) {
-            body.changeColor(Color.WHITE);
+            body.changeColor(lowColor);
             Component c = controller.getModel().getComponentById(id);
             if (c instanceof hu.uni_pannon.sim.logic.Input) {
                 ((hu.uni_pannon.sim.logic.Input)c).low();
@@ -310,16 +313,16 @@ public class GraphicalObject extends Group {
             if (c instanceof hu.uni_pannon.sim.logic.Input) {
                 ((hu.uni_pannon.sim.logic.Input)c).high();
             }
-            body.changeColor(Color.BLUE);
+            body.changeColor(highColor);
         }
         interacted = !interacted;
     }
 
     public void setState(boolean val) {
         if (val) 
-            body.changeColor(Color.BLUE);
+            body.changeColor(highColor);
         else
-            body.changeColor(Color.WHITE);
+            body.changeColor(lowColor);
     }
 
     // Move functionallity
