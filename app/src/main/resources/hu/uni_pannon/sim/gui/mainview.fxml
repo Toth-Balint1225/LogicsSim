@@ -23,11 +23,10 @@
          <children>
             <Accordion>
               <panes>
-                <TitledPane animated="false" text="Input/Output">
+                <TitledPane fx:id="componentsTitledPane" animated="false" text="Components">
                      <content>
                         <ListView fx:id="componentSelectorListView" prefHeight="200.0" prefWidth="200.0" />
                      </content></TitledPane>
-                <TitledPane animated="false" text="Logic gates" />
               </panes>
             </Accordion>
          </children>
