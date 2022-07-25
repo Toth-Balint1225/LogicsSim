@@ -8,7 +8,12 @@ import java.util.Arrays;
 
 import org.junit.Test;
 
-import hu.uni_pannon.sim.gates.AndGate;
+import hu.uni_pannon.sim.logic.Component;
+import hu.uni_pannon.sim.logic.Input;
+import hu.uni_pannon.sim.logic.InvalidParamException;
+import hu.uni_pannon.sim.logic.Output;
+import hu.uni_pannon.sim.logic.Wire;
+import hu.uni_pannon.sim.logic.gates.AndGate;
 
 public class AppTest {
     

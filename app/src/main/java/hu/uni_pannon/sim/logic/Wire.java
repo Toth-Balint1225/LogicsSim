@@ -1,4 +1,4 @@
-package hu.uni_pannon.sim;
+package hu.uni_pannon.sim.logic;
 
 import java.util.Arrays;
 
@@ -59,6 +59,26 @@ public class Wire extends Component {
         addInput(inId, in);
         out.addInput(outId, this);
         return this;
+    }
+
+    public Wire from(String inId, Component in) {
+        addInput(inId,in);
+        return this;
+    }
+
+    public Wire to(String outId, Component out) {
+        out.addInput(outId, this);
+        return this;
+    }
+
+    public boolean getState() {
+        boolean res  = false;
+        try {
+            res = in.eval(inId);
+        } catch (InvalidParamException e) {
+            e.printStackTrace();
+        }
+        return res;
     }
 
     /**
