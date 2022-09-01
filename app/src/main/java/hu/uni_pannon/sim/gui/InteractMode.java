@@ -16,7 +16,7 @@ public class InteractMode implements Mode {
             return;
         if (evt.isPrimaryButtonDown()) {
             controller.getDrawingArea().getObjectById(id).interact();
-            controller.evaluate();
+            //controller.evaluate();
         }
     }
 

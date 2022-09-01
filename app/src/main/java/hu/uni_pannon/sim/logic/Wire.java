@@ -71,33 +71,35 @@ public class Wire extends Component {
         return this;
     }
 
+    // TODO deprecate this pls
     public boolean getState() {
         boolean res  = false;
         try {
-            res = in.eval(inId);
+            res = in.getActualState(inId);
         } catch (InvalidParamException e) {
             e.printStackTrace();
         }
         return res;
     }
 
-    /**
-     * Implementation of the clone design pattern: returns an identical copy of itself.
-     */
     @Override
     public Wire clone() {
         return new Wire();
     }
 
-    /**
-     * Override of the default eval function. It directly calls the 
-     * eval of the input object and relays it to the output.
-     * The wire doesn't have any cache feature. (yet)
-     */
     @Override
-    public boolean eval(String output) throws InvalidParamException {
-        // possibly cache the value
-        System.out.println("[EVAL] " + this + " for output " + output);
-        return in.eval(inId);
+    public boolean getActualState(String output) throws InvalidParamException {
+	return in.getActualState(inId);
     }
+
+    @Override
+    public void changeState() {
+	return;
+    }
+
+    @Override
+    public void genNextState() {
+	return;
+    }
+
 }

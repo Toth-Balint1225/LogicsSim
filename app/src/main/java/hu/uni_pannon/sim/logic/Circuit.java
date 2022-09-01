@@ -58,17 +58,17 @@ public class Circuit {
      * @throws InvalidParamException
      */
     public void evaluate() throws InvalidParamException {
-        // naive linear searching
+	System.out.println("[CIRCUIT] eval started");
+	// evaluate all with the actual states 
         for (Map.Entry<String,Component> entry : components.entrySet()) {
-            if (entry.getValue() instanceof Output) {
-                ((Output)entry.getValue()).eval();
-            }
-        }
-    }
+	    entry.getValue().genNextState();
+	}
 
-    public void clear() {
+	System.out.println("[CIRCUIT] state change started");
+	// change the new satates to actual
         for (Map.Entry<String,Component> entry : components.entrySet()) {
-            entry.getValue().reset();
-        }
+	    entry.getValue().changeState();
+	}
+	System.out.println("[CIRCUIT] eval finished\n\n\n");
     }
 }

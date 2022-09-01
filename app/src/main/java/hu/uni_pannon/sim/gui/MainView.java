@@ -95,6 +95,11 @@ public class MainView {
         mode = new PlaceMode(this);
     }
 
+    @FXML
+    public void onStepButtonClicked(Event e) {
+	evaluate();
+    }
+
     public void spawnComponent(Component c, double x, double y) {
         // add to the model (VERY TEMPORARY)
         String id = "component"+MainView.getComponentNum();
@@ -195,7 +200,6 @@ public class MainView {
 
     public void evaluate() {
         try {
-            model.clear();
             model.evaluate();
         } catch (InvalidParamException e) {
             e.printStackTrace();

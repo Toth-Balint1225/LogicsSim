@@ -30,14 +30,4 @@ public class Output extends Component {
     public Output clone() {
         return new Output();
     }
-
-    /**
-     * Convinience overload of the component's eval function,
-     * since the output only has one non-changable output.
-     * @return the result of the evaluated graph behind the output
-     * @throws InvalidParamException
-     */
-    public boolean eval() throws InvalidParamException {
-        return super.eval("out");
-    }
 }

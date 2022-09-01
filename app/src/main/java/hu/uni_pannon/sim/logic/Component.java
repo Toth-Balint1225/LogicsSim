@@ -1,10 +1,10 @@
 package hu.uni_pannon.sim.logic;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
-import java.util.LinkedList;
+import java.util.stream.Collectors;
 
 /**
  * The Black box model of a combinational system. Black-boxness comes from the base concept that we 
@@ -70,94 +70,6 @@ public class Component {
     }
 
     /**
-     * The semi-smart cache feature of the component.
-     * The cache is meant to store the boolean value of pins
-     * associated to string identifiers. (another reson why these 
-     * strings are really important) The cache can be erased, set and
-     * so-called soft cleared which means that the storage indicator
-     * is not set, but the values still persist.
-     */
-    public class Cache {
-        private Map<String,Boolean> data;
-        private boolean isSet;
-
-        /**
-         * Init a cache with the labels we want to store
-         * @param labels the list of labels (string pin identifiers)
-         */
-        public Cache(List<String> labels) {
-            isSet = false;
-            data = new TreeMap<>();
-            labels.stream()
-                .forEach((str) -> data.put(str,false));
-        }
-
-        /**
-         * Get the stored value of the specified identifier.
-         * @param key the string id of the pin 
-         * @return the boolean value of the last evaluation's result
-         */
-        public boolean get(String key) {
-            return data.get(key);
-        }
-
-        /**
-         * Convinience method to manually set the cache's value
-         * @param key the id of the pin to be set
-         * @param value the value to be set
-         */
-        public void setValue(String key, boolean value) {
-            data.put(key,value);
-        }
-
-        /**
-         * Query for all the pins that are stored in the cache
-         * @return the list of the pin ids.
-         */
-        public Set<String> keys() {
-            return data.keySet();
-        }
-
-        /**
-         * Important method that uses the master component's LUT to evaluate all
-         * the requested input pins.
-         * @param evalInputs the list of inputs that we want to evaluate
-         * @throws InvalidParamException 
-         */
-        public void store(List<String> evalInputs) throws InvalidParamException {
-            for (String key : data.keySet()) {
-                data.put(key,Component.this.lut.evaluate(evalInputs,key));
-            }
-            isSet = true;
-        }
-
-        /**
-         * Erases the cache with all of its values that will be reset to false.
-         */
-        public void clear() {
-            data.entrySet().stream().forEach((entry) -> entry.setValue(false));
-            isSet = false;
-        }
-
-        /**
-         * Safer clear functionallity that sets the indicator to false, so
-         * the cache can store values again, but does not erase the storage.
-         */
-        public void softClear() {
-            isSet = false;
-        }
-
-        /**
-         * Query for the set indicator.
-         * @return the indicator that tells if the cache is actually storing values
-         */
-        public boolean isSet() {
-            return isSet;
-        }
-
-    }
-
-    /**
      * The very imortant lookup table that makes the component a black-box 
      */
     protected LookupTable lut;
@@ -167,27 +79,17 @@ public class Component {
      * that they are connected to.
      */
     protected Map<String,Component> ins;
-    
-    /**
-     * Based on the evaluation structure, the output values are stored in cache.
-     */
-    protected Cache outputCache;
 
+    // state data
     /**
-     * Not used at the moment.
+     * the 'next' state calculated from the actual states.
      */
-    protected Cache inputCache;
+    protected Map<String,Boolean> actualState;
+    /**
+     * the actual state that is used to calculate the next state.
+     */
+    protected Map<String,Boolean> nextState;
 
-    /**
-     * Evaluation indicator that can be used to tell if the circuit structure contains 
-     * loops. (loops are bad.)
-     */
-    protected boolean evaluating;
-
-    /**
-     * Some basis for the loop management, not used.
-     */
-    protected boolean needsForward;
 
     protected Component() {
     }
@@ -210,10 +112,14 @@ public class Component {
     protected void init(List<String> inputs, List<String> outputs) {
         lut = new LookupTable(inputs,outputs);
         ins = new TreeMap<>();
-        outputCache = new Cache(outputs);
-        inputCache = new Cache(inputs);
-        evaluating = false;
-        needsForward = false;
+
+	actualState = new TreeMap<>();
+	nextState = new TreeMap<>();
+	outputs.stream()
+	    .forEach(s -> {
+		    actualState.put(s,false);
+		    nextState.put(s,false);
+		});
     }
 
     /**
@@ -257,70 +163,47 @@ public class Component {
     }
 
     /**
-     * Hard clears the cache
+     * State transition
      */
-    public void reset() {
-        outputCache.clear();
+    public void changeState() {
+	// deep copy the elements from next to actual state
+	for (Map.Entry<String,Boolean> it : nextState.entrySet())
+	    actualState.put(it.getKey(),it.getValue());
     }
 
-    /**
-     * Implementation of the evaluation, uses to cache to eval and store the values.
-     * @throws InvalidParamException
-     */
-    protected void evalImpl() throws InvalidParamException {
-        // need to evaluate for the cache
-        List<String> evalInputs = new LinkedList<>();
-        for (String input : ins.keySet()) {
-            if (ins.get(input).eval(input)) {
-                evalInputs.add(input);
-                inputCache.setValue(input,true);
-            }
-        }
-
-        // eval stuff saved here
-        outputCache.store(evalInputs);
-
-        // debug
-        /*
-        System.out.println("[CACHE] " + this);
-        cache.entrySet().stream().forEach((entry) -> System.out.println(entry.getKey() + " -> " + entry.getValue()));
-        */
+    // this is just a getter now
+    public boolean getActualState(String output) throws InvalidParamException {
+	System.out.println("[EVAL] getting value of " + output);
+	boolean res = false;
+	try {
+	    res = actualState.get(output);
+	} catch (NullPointerException ex) {
+	    throw new InvalidParamException(output);
+	}
+	return res;
     }
 
-    /**
-     * The main evaluation interface function. Evaluates all the outputs of the component.
-     * @param output
-     * @return
-     * @throws InvalidParamException
-     */
-    public boolean eval(String output) throws InvalidParamException {
-        if (evaluating) {
-            needsForward = true;
-            return outputCache.get(output);
-        }
-        evaluating = true;
-        // fetch the inputs that eval to 1
-        System.out.println("[EVAL] " + this + " for output " + output);
-        if (!outputCache.isSet())
-            evalImpl();
-        
-        evaluating = false;
-        return outputCache.get(output);
+    public void genNextState() {
+	System.out.println("[STATE] generating next state");
+	List<String> activeIns = new LinkedList<>();
+	for (String it : ins.keySet()) {
+	    try {
+		if (ins.get(it).getActualState(it))
+		    activeIns.add(it);
+	    } catch (InvalidParamException ex) {
+		ex.printStackTrace();
+	    } catch (NullPointerException ex) {
+		ex.printStackTrace();
+	    }
+
+	}
+
+	for (String it : actualState.keySet()) {
+	    try {
+	    nextState.put(it,lut.evaluate(activeIns,it));
+	    } catch (InvalidParamException ex) {
+		ex.printStackTrace();
+	    }
+	}
     }
-
-    /**
-     * Experimental, should not be used
-     * @param from
-     * @param output
-     * @throws InvalidParamException
-     */
-    @Deprecated
-    public void propagateForward(Component from, String output) throws InvalidParamException {
-        if (from.equals(this)) {
-            // compare to the input cache
-        }
-        evalImpl();
-    }
-
-
 }

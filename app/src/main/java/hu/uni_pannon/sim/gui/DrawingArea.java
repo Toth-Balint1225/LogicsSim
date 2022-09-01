@@ -73,7 +73,7 @@ public class DrawingArea extends Group {
             Component c = controller.getModel().getComponentById(obj.getKey());
             if (c instanceof hu.uni_pannon.sim.logic.Output) {
                 try {
-                    boolean value = c.eval("out");
+                    boolean value = c.getActualState("out");
                     obj.getValue().setState(value);
                 } catch (InvalidParamException e) {
                     e.printStackTrace();
