@@ -1,5 +1,6 @@
 package hu.uni_pannon.sim;
 
+import hu.uni_pannon.sim.gui.MainView;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -20,6 +21,12 @@ public class App extends Application {
         primaryStage.setScene(new Scene(root));
         primaryStage.sizeToScene();
         //primaryStage.setMaximized(true);
+
+	MainView controller = (MainView)loader.getController();
+	primaryStage.setOnHidden(evt -> {
+		controller.stopRefreshThread();
+	    });
+
         primaryStage.show();
     }
 }

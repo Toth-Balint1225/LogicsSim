@@ -13,6 +13,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
+import javafx.application.Platform;
 
 public class MainView {
 
@@ -52,6 +53,9 @@ public class MainView {
 
     private Mode mode;
 
+    private Thread refreshThread;
+    private volatile boolean refreshThreadActive = false;
+
 
     private static int componentNum = 0;
 
@@ -76,6 +80,41 @@ public class MainView {
             Gate.input, Gate.output, Gate.and, Gate.or, Gate.not, Gate.xor, Gate.nand, Gate.nor, Gate.xnor
         );
         componentSelectorListView.setItems(componentItems);
+
+
+	startRefreshThread();
+    }
+
+    public synchronized void startRefreshThread() {
+	if (refreshThreadActive)
+	    return;
+	refreshThreadActive = true;
+	refreshThread = new Thread(() -> {
+		while (refreshThreadActive) {
+		    evaluate();
+		    try {
+			Thread.sleep(10);
+		    } catch (Exception e) {
+			e.printStackTrace();
+		    }
+		}
+	});
+	refreshThread.start();
+    }
+
+    public synchronized void stopRefreshThread() {
+	if (!refreshThreadActive)
+	    return;
+	refreshThreadActive = false;
+	try {
+	    refreshThread.join();
+	} catch (Exception e) {
+	    e.printStackTrace();
+	}
+    }
+
+    private synchronized boolean isRefreshThreadActive() {
+	return refreshThreadActive;
     }
     
     @FXML
@@ -97,9 +136,20 @@ public class MainView {
 
     @FXML
     public void onStepButtonClicked(Event e) {
-	evaluate();
+	if (!isRefreshThreadActive())
+	    evaluate();
     }
 
+    @FXML
+    public void onStartButtonClicked(Event e) {
+	startRefreshThread();
+    }
+
+    @FXML
+    public void onStopButtonClicked(Event e) {
+	stopRefreshThread();
+    }
+    
     public void spawnComponent(Component c, double x, double y) {
         // add to the model (VERY TEMPORARY)
         String id = "component"+MainView.getComponentNum();
@@ -199,11 +249,7 @@ public class MainView {
     }
 
     public void evaluate() {
-        try {
-            model.evaluate();
-        } catch (InvalidParamException e) {
-            e.printStackTrace();
-        }
+	model.evaluate();
         da.updateView(); 
     }
 }

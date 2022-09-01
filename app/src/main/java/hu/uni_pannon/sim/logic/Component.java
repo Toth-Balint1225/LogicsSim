@@ -3,8 +3,8 @@ package hu.uni_pannon.sim.logic;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
 
 /**
  * The Black box model of a combinational system. Black-boxness comes from the base concept that we 
@@ -172,26 +172,24 @@ public class Component {
     }
 
     // this is just a getter now
-    public boolean getActualState(String output) throws InvalidParamException {
-	System.out.println("[EVAL] getting value of " + output);
+    public Optional<Boolean> getActualState(String output) {
+	// System.out.println("[EVAL] getting value of " + output);
 	boolean res = false;
 	try {
 	    res = actualState.get(output);
 	} catch (NullPointerException ex) {
-	    throw new InvalidParamException(output);
+	    return Optional.empty();
 	}
-	return res;
+	return Optional.of(res);
     }
 
     public void genNextState() {
-	System.out.println("[STATE] generating next state");
+	// System.out.println("[STATE] generating next state");
 	List<String> activeIns = new LinkedList<>();
 	for (String it : ins.keySet()) {
 	    try {
-		if (ins.get(it).getActualState(it))
+		if (ins.get(it).getActualState(it).get())
 		    activeIns.add(it);
-	    } catch (InvalidParamException ex) {
-		ex.printStackTrace();
 	    } catch (NullPointerException ex) {
 		ex.printStackTrace();
 	    }
@@ -199,11 +197,9 @@ public class Component {
 	}
 
 	for (String it : actualState.keySet()) {
-	    try {
-	    nextState.put(it,lut.evaluate(activeIns,it));
-	    } catch (InvalidParamException ex) {
-		ex.printStackTrace();
-	    }
+	    Optional<Boolean> res = lut.evaluate(activeIns,it);
+	    if (res.isPresent())
+		nextState.put(it,res.get());
 	}
     }
 }

@@ -72,15 +72,11 @@ public class DrawingArea extends Group {
         for (Map.Entry<String,GraphicalObject> obj : objs.entrySet()) {
             Component c = controller.getModel().getComponentById(obj.getKey());
             if (c instanceof hu.uni_pannon.sim.logic.Output) {
-                try {
-                    boolean value = c.getActualState("out");
-                    obj.getValue().setState(value);
-                } catch (InvalidParamException e) {
-                    e.printStackTrace();
-                }
+		boolean value = c.getActualState("out").orElse(false);
+		obj.getValue().setState(value);
             }
             if (c instanceof hu.uni_pannon.sim.logic.Wire) {
-                boolean value = ((hu.uni_pannon.sim.logic.Wire)c).getState();
+                boolean value = ((hu.uni_pannon.sim.logic.Wire)c).getState().orElse(false);
                 obj.getValue().setState(value);
             }
         }

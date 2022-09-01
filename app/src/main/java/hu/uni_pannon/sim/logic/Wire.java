@@ -1,6 +1,7 @@
 package hu.uni_pannon.sim.logic;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 /**
  * A component derivative used to connect components. The wire is also a Component and stores
@@ -72,14 +73,8 @@ public class Wire extends Component {
     }
 
     // TODO deprecate this pls
-    public boolean getState() {
-        boolean res  = false;
-        try {
-            res = in.getActualState(inId);
-        } catch (InvalidParamException e) {
-            e.printStackTrace();
-        }
-        return res;
+    public Optional<Boolean> getState() {
+	return in.getActualState(inId);
     }
 
     @Override
@@ -88,7 +83,7 @@ public class Wire extends Component {
     }
 
     @Override
-    public boolean getActualState(String output) throws InvalidParamException {
+    public Optional<Boolean> getActualState(String output) {
 	return in.getActualState(inId);
     }
 

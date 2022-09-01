@@ -4,6 +4,7 @@ import java.util.TreeMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * The lookup table is the core functionallity of a combinational network. This implementation
@@ -144,9 +145,10 @@ public class LookupTable {
                 throw new InvalidParamException(output);
             }
         }
-
-        int idx = 0;
-        idx = fetchRow(inputs);
+	Optional<Integer> row = fetchRow(inputs);
+	if (!row.isPresent())
+	    throw new InvalidParamException("Row not found");
+        int idx = row.get();
         for (String o : outputs)
             outputTable[idx][outputIndexes.get(o)] = true;
     }
@@ -167,32 +169,40 @@ public class LookupTable {
                 throw new InvalidParamException(output);
             }
         }
-        int idx = 0;
-        idx = fetchRow(inputs);
+	Optional<Integer> row = fetchRow(inputs);
+	if (!row.isPresent())
+	    throw new InvalidParamException("Row not found");
+        int idx = row.get();
         for (String o : outputs)
             outputTable[idx][outputIndexes.get(o)] = false;
     }
 
-    public boolean evaluate(List<String> inputs, String output) throws InvalidParamException {
+    public Optional<Boolean> evaluate(List<String> inputs, String output) {
         if (output == null) {
-            throw new InvalidParamException("No output parameter specified");
+            return Optional.empty();
         }
         if (!outputIndexes.containsKey(output)) {
-            throw new InvalidParamException(output);
+            return Optional.empty();
         }
-        int idx = fetchRow(inputs);
-        return outputTable[idx][outputIndexes.get(output)];
+        Optional<Integer> row = fetchRow(inputs);
+	if (!row.isPresent())
+	    return Optional.empty();
+	else {
+	    int idx = row.get();
+	    return Optional.of(outputTable[idx][outputIndexes.get(output)]);
+	}
     }
 
-    private int fetchRow(List<String> inputs) throws InvalidParamException {
+    
+    private Optional<Integer> fetchRow(List<String> inputs) {
         for (String s : inputs) {
             if (!inputIndexes.containsKey(s)) {
-                throw new InvalidParamException(s);
+                return Optional.empty();
             }
         }
 
         if (inputs.size() == 0) {
-            return 0;
+            return Optional.of(0);
         }
 
         for (int i=0;i<rows;i++) {
@@ -202,10 +212,10 @@ public class LookupTable {
                     count++;
             }
             if (count == inputs.size()) {
-                return i;
+                return Optional.of(i);
             }
         }
-        return 0;
+        return Optional.of(0);
     }
 
     public void invert() {
