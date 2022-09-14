@@ -1,6 +1,7 @@
 package hu.uni_pannon.sim.logic;
 
 import java.util.TreeMap;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -195,27 +196,55 @@ public class LookupTable {
 
     
     private Optional<Integer> fetchRow(List<String> inputs) {
-        for (String s : inputs) {
-            if (!inputIndexes.containsKey(s)) {
-                return Optional.empty();
-            }
-        }
 
         if (inputs.size() == 0) {
             return Optional.of(0);
         }
 
+	// get the indices
+	// then sum the 2 powers on the indices
+	// -> that's the row we want
+
+	int[] powers = new int[inputs.size()];
+	int idx = 0;
+	for (String s : inputs) {
+            if (!inputIndexes.containsKey(s)) {
+                return Optional.empty();
+            }
+	    powers[idx] = inputIndexes.get(s);
+	    System.out.println("" + powers[idx]);
+	    idx++;
+	}
+
+	int row = Arrays.stream(powers)
+	    .reduce(0,(x,y) -> x + (int)Math.pow(2,y));
+
+	System.out.println("row: " + row);
+	return Optional.of(row);
+	
+	/*
+	// search for the correct row
+	// iterate over all rows
         for (int i=0;i<rows;i++) {
+	    // match counter
             int count = 0;
+
+	    // iterate over the row
             for (int j=0;j<inputs.size();j++) {
+
+		// if the table's cell is true, then inc matches
                 if (inputTable[i][inputIndexes.get(inputs.get(j))])
                     count++;
             }
+
+	    // if we found all of them, then return
             if (count == inputs.size()) {
                 return Optional.of(i);
             }
         }
+
         return Optional.of(0);
+	*/
     }
 
     public void invert() {

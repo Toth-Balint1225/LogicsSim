@@ -38,7 +38,12 @@ public class Circuit {
      * TODO: check id correctness
      */
     public void remove(String id) {
-        components.remove(id);
+        try {
+            components.remove(id);
+        } catch (Exception e) {
+            // this is a very bat thing to happen
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -53,9 +58,6 @@ public class Circuit {
 
     /**
      * Evaluation of the whole circuit.
-     * TODO: clear caches of the components
-     * TODO: optimize the output searching
-     * @throws InvalidParamException
      */
     public void evaluate() {
 	// System.out.println("[CIRCUIT] eval started");
