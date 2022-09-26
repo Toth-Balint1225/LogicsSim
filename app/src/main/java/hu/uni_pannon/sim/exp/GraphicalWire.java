@@ -7,24 +7,49 @@ import java.util.Optional;
 import hu.uni_pannon.sim.logic.Component;
 import hu.uni_pannon.sim.logic.Wire;
 import javafx.beans.property.DoubleProperty;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Line;
 
 public class GraphicalWire {
 
-    private static enum Orientation {
+    private enum Orientation {
         HORIZONTAL,
         VERTICAL,
     }
 
-    private static class Segment {
+    private class Segment {
         Line line;
         Orientation orientation;
         boolean fix;
 
         public Segment() {
             line = new Line();
+            line.setStrokeWidth(2);
             orientation = Orientation.HORIZONTAL;
             fix = false;
+
+            line.addEventHandler(MouseEvent.MOUSE_PRESSED, evt -> {
+                int idx = GraphicalWire.this.segments.indexOf(this);
+                if (idx != -1)  // this is the default error value... so nice of you Java API
+                    GraphicalWire.this.segmentAcivity(ActivityType.ACT_PRESS, idx, evt.getX(), evt.getY());
+            });
+            line.addEventHandler(MouseEvent.MOUSE_ENTERED, evt -> {
+                int idx = GraphicalWire.this.segments.indexOf(this);
+                if (idx != -1)  // this is the default error value... so nice of you Java API
+                    GraphicalWire.this.segmentAcivity(ActivityType.ACT_ENTER, idx, evt.getX(), evt.getY());
+            });
+            line.addEventHandler(MouseEvent.MOUSE_EXITED, evt -> {
+                int idx = GraphicalWire.this.segments.indexOf(this);
+                if (idx != -1)  // this is the default error value... so nice of you Java API
+                    GraphicalWire.this.segmentAcivity(ActivityType.ACT_EXIT, idx, evt.getX(), evt.getY());
+            });
+            line.addEventHandler(MouseEvent.MOUSE_DRAGGED, evt -> {
+                int idx = GraphicalWire.this.segments.indexOf(this);
+                if (idx != -1)  // this is the default error value... so nice of you Java API
+                    GraphicalWire.this.segmentAcivity(ActivityType.ACT_DRAG, idx, evt.getX(), evt.getY());
+            });
         }
     }
 
@@ -48,6 +73,76 @@ public class GraphicalWire {
     public boolean isDrawingLine() {
         return drawingLine;
     }
+
+    private void segmentAcivity(ActivityType type, int segmentIndex, double x, double y) {
+        switch (type) {
+        case ACT_ENTER: 
+            color(Color.GREEN);
+            break;
+        case ACT_EXIT:
+            color(Color.BLACK);
+            break;
+        case ACT_DRAG:
+            dragSegment(segmentIndex, x, y);
+            break;
+        default:
+            System.out.println("Line segment activity at " + segmentIndex);
+            break;
+        }
+    }
+
+    private void color(Paint color) {
+        for (Segment s : segments) {
+            s.line.setStroke(color);
+        }
+    }
+
+    private Optional<Segment> neighbourOf(int idx) {
+        if (idx < 0 || idx >= segments.size())
+            return Optional.empty();
+        else
+            return Optional.of(segments.get(idx));
+    }
+
+    private void dragSegment(int idx, double x, double y) {
+        // idx = 0 -> first segment, start is fixed
+        // idx = end -> last segment, end is fixed
+        if (idx == 0 || idx == segments.size() - 1)
+            return;
+
+        Optional<Segment> prev = neighbourOf(idx - 1);
+        Optional<Segment> next = neighbourOf(idx + 1);
+        Segment current = segments.get(idx);
+
+        switch (current.orientation) {
+        case HORIZONTAL:
+            current.line.setStartY(y);
+            current.line.setEndY(y);
+            prev.ifPresent(seg -> {
+                seg.line.setEndY(y);
+            });
+
+            next.ifPresent(seg -> {
+                seg.line.setStartY(y);
+            });
+            break;
+        case VERTICAL:
+            System.out.println("Current is vertical");
+            current.line.setStartX(x);
+            current.line.setEndX(x);
+            prev.ifPresent(seg -> {
+                seg.line.setEndX(x);
+            });
+
+            next.ifPresent(seg -> {
+                seg.line.setStartX(x);
+            });
+            break;
+        default:
+            break;
+        }
+    }
+
 
 	public void follow(double x, double y) {
         if (Math.abs(startX - x) < Math.abs(startY - y)) {
@@ -144,6 +239,7 @@ public class GraphicalWire {
                             l2.line.setStartY(startY);
                             l2.line.setEndX(midX);
                             l2.line.setEndY(y.get());
+                            l2.orientation = Orientation.VERTICAL;
                             segments.add(l2);
                             workspace.getChildren().add(l2.line);
                             
@@ -152,6 +248,7 @@ public class GraphicalWire {
                             l3.line.setStartY(y.get());
                             l3.line.endXProperty().bind(x);
                             l3.line.endYProperty().bind(y);
+                            l3.orientation = Orientation.HORIZONTAL;
                             segments.add(l3);
                             workspace.getChildren().add(l3.line);
                             l3.fix = true;
@@ -163,10 +260,11 @@ public class GraphicalWire {
                             seg.line.setEndY(midY);
                             
                             Segment l2 = new Segment();
-                            l2.line.setStartX(x.get());
+                            l2.line.setStartX(startX);
                             l2.line.setStartY(midY);
-                            l2.line.setEndX(startX);
+                            l2.line.setEndX(x.get());
                             l2.line.setEndY(midY);
+                            l2.orientation = Orientation.HORIZONTAL;
                             segments.add(l2);
                             workspace.getChildren().add(l2.line);
 
@@ -175,6 +273,7 @@ public class GraphicalWire {
                             l3.line.setStartY(midY);
                             l3.line.endXProperty().bind(x);
                             l3.line.endYProperty().bind(y);
+                            l3.orientation = Orientation.VERTICAL;
                             segments.add(l3);
                             workspace.getChildren().add(l3.line);
                             l3.fix = true;
@@ -204,6 +303,50 @@ public class GraphicalWire {
             });
         }
 		drawingLine = false;
+        
+        // segment movement
+        Segment first = segments.get(0);
+        Segment last = segments.get(segments.size() - 1);
+
+        first.line.startXProperty().addListener(evt -> {
+            if (first.orientation == Orientation.VERTICAL) {
+                first.line.setEndX(first.line.getStartX());
+                Optional<Segment> next = neighbourOf(1);
+                next.ifPresent(seg -> {
+                    seg.line.setStartX(first.line.getStartX());
+                });
+            }
+        });
+
+        first.line.startYProperty().addListener(evt -> {
+            if (first.orientation == Orientation.HORIZONTAL) {
+                first.line.setEndY(first.line.getStartY());
+                Optional<Segment> next = neighbourOf(1);
+                next.ifPresent(seg -> {
+                    seg.line.setStartY(first.line.getStartY());
+                });
+            }
+        });
+
+        last.line.endXProperty().addListener(evt -> {
+            if (last.orientation == Orientation.VERTICAL) {
+                last.line.setStartX(last.line.getEndX());
+                Optional<Segment> prev = neighbourOf(segments.size() - 2);
+                prev.ifPresent(seg -> {
+                    seg.line.setEndX(last.line.getEndX());
+                });
+            }
+        });
+        last.line.endYProperty().addListener(evt -> {
+            if (last.orientation == Orientation.HORIZONTAL) {
+                last.line.setStartY(last.line.getEndY());
+                Optional<Segment> prev = neighbourOf(segments.size() - 2);
+                prev.ifPresent(seg -> {
+                    seg.line.setEndY(last.line.getEndY());
+                });
+            }
+        });
+
 	}
 
     private Optional<Segment> prevSegment() {
