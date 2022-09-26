@@ -1,0 +1,101 @@
+package hu.uni_pannon.sim.exp;
+
+import hu.uni_pannon.sim.logic.Component;
+import hu.uni_pannon.sim.logic.Wire;
+import javafx.beans.property.DoubleProperty;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.shape.LineTo;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.Path;
+
+public class GraphicalWire {
+    private Path path;
+    private LineTo tempLine;
+	private double startX, startY;
+    private Workspace workspace;
+
+    private Wire model;
+    private String id;
+
+    private boolean drawingLine;
+
+    public GraphicalWire(Workspace workspace) {
+        this.model = new Wire();
+        this.workspace = workspace;
+        drawingLine = false;
+        path = new Path();
+        path.addEventHandler(MouseEvent.MOUSE_PRESSED, evt -> {
+            
+        });
+    }
+
+    public boolean isDrawingLine() {
+        return drawingLine;
+    }
+
+	public void follow(double x, double y) {
+        if (Math.abs(startX - x) < Math.abs(startY - y)) {
+			tempLine.setY(y);
+			tempLine.setX(startX);
+		} else {
+			tempLine.setX(x);
+			tempLine.setY(startY);
+		}}
+
+	public void segment(double x, double y) {
+        startX = tempLine.getX();
+        startY = tempLine.getY();
+        tempLine = new LineTo();
+        tempLine.setX(startX);
+        tempLine.setY(startY);
+        path.getElements().add(tempLine);
+	}
+
+	public void startLine(DoubleProperty x, DoubleProperty y, Component comp, String pinId) {
+        model.addInput(pinId, comp);
+        startX = x.get();
+        startY = y.get();
+        workspace.getChildren().add(path);
+        MoveTo init = new MoveTo();
+        init.xProperty().bind(x);
+        init.yProperty().bind(y);
+        tempLine = new LineTo();
+        tempLine.setX(startX);
+        tempLine.setY(startY);
+        path.getElements().addAll(init,tempLine);
+		drawingLine = true;
+	}
+
+	public void finishLine(DoubleProperty x, DoubleProperty y, Component comp, String pinId) {
+        model.to(pinId, comp);
+        if (x.get() != startX || y.get() != startY) {
+            // connect them with something temp
+            double distX = startX - x.get();
+            double distY = startY - y.get();
+            if (Math.abs(distX) > Math.abs(distY)) {
+                tempLine.setX(startX - (distX / 2));
+                tempLine.setY(startY);
+                LineTo l2 = new LineTo();
+                l2.setX(startX - (distX / 2));
+                l2.setY(y.get());
+                LineTo l3 = new LineTo();
+                l3.xProperty().bind(x);
+                l3.yProperty().bind(y);
+                path.getElements().addAll(l2,l3);
+            } else {
+                double midY = startY - (distY / 2);
+                tempLine.setX(startX);
+                tempLine.setY(midY);
+                LineTo l2 = new LineTo();
+                l2.setX(x.get());
+                l2.setY(midY);
+                LineTo l3 = new LineTo();
+                l3.xProperty().bind(x);
+                l3.yProperty().bind(y);
+                path.getElements().addAll(l2,l3);
+            }
+        }
+		drawingLine = false;
+	}
+
+}
