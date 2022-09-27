@@ -7,6 +7,8 @@ import java.util.TreeMap;
 
 import hu.uni_pannon.sim.logic.Component;
 import hu.uni_pannon.sim.logic.gates.AndGate;
+import hu.uni_pannon.sim.logic.gates.NotGate;
+import hu.uni_pannon.sim.logic.gates.OrGate;
 import javafx.scene.Group;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
@@ -39,17 +41,24 @@ public final class Workspace extends Group {
 
         // test
         Component c = new AndGate(2);
-        Component c2 = new AndGate(3);
+        Component c2 = new OrGate(2);
+        Component c3 = new NotGate();
         GraphicalComponent g1 = new GraphicalComponent("and1",this,c);
-        GraphicalComponent g2 = new GraphicalComponent("and2",this,c2);
+        GraphicalComponent g2 = new GraphicalComponent("or1",this,c2);
+        GraphicalComponent g3 = new GraphicalComponent("buf",this,c3);
+        
         g1.xProperty().set(50);
         g1.yProperty().set(100);
         g2.xProperty().set(300);
         g2.yProperty().set(300);
-        GraphicsFactory.giveAnd(g1,Direction.RIGHT);
-        GraphicsFactory.giveAnd(g2,Direction.RIGHT);
+        g3.xProperty().set(100);
+        g3.yProperty().set(150);
+        GraphicsFactory.giveOr(g1);
+        GraphicsFactory.giveXnor(g2);
+        GraphicsFactory.giveBuffer(g3);
         addComponent(g1);
         addComponent(g2);
+        addComponent(g3);
 
 
         p.addEventHandler(MouseEvent.MOUSE_DRAGGED, evt -> {
@@ -129,7 +138,7 @@ public final class Workspace extends Group {
                 if (input && nextWire.isDrawingLine()) {
                     getComponentById(compId).ifPresent(c -> {
                             c.getPinById(pinId).ifPresent(p -> {
-                                nextWire.finishLine(p.xProperty(),p.yProperty(),c.getModel(),pinId);
+                                nextWire.finishLine(p.anchorX(),p.anchorY(),c.getModel(),pinId);
                                 nextWire = new GraphicalWire(this);
                             });
                         });
@@ -137,7 +146,7 @@ public final class Workspace extends Group {
                 if (!(input || nextWire.isDrawingLine())){
                     getComponentById(compId).ifPresent(c -> {
                             c.getPinById(pinId).ifPresent(p -> {
-                                nextWire.startLine(p.xProperty(),p.yProperty(),c.getModel(),pinId);
+                                nextWire.startLine(p.anchorX(),p.anchorY(),c.getModel(),pinId);
                             });
                         });
                 } 

@@ -6,30 +6,61 @@ import javafx.scene.Group;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Line;
 
 public class Pin {
 
     private String id;
     private Circle c;
+    private Line l;
     private GraphicalComponent parent;
 
     private DoubleProperty xProperty,yProperty;
     private Group graphics;
+    private Direction dir;
 
     private boolean isInput;
 
-    public Pin(String id, GraphicalComponent parent) {
+    public Pin(String id, GraphicalComponent parent, Direction dir) {
         this.id = id;
         this.parent = parent;
+        this.dir = dir;
         graphics = new Group();
         c = new Circle();
         c.setRadius(5);
         xProperty = new SimpleDoubleProperty();
         yProperty = new SimpleDoubleProperty();
-        c.centerXProperty().bind(xProperty);
-        c.centerYProperty().bind(yProperty);
         c.setFill(Color.BLACK);
-        graphics.getChildren().add(c);
+
+        double length = 10;
+
+        l = new Line();
+        l.startXProperty().bind(xProperty);
+        l.startYProperty().bind(yProperty);
+        c.centerXProperty().bind(l.endXProperty());
+        c.centerYProperty().bind(l.endYProperty());
+
+        switch (this.dir) {
+        case DOWN:
+            l.endXProperty().bind(xProperty);
+            l.endYProperty().bind(yProperty.add(length));
+            break;
+        case UP:
+            l.endXProperty().bind(xProperty);
+            l.endYProperty().bind(yProperty.subtract(length));
+            break;
+        case LEFT:
+            l.endXProperty().bind(xProperty.subtract(length));
+            l.endYProperty().bind(yProperty);
+            break;
+        case RIGHT:
+            l.endXProperty().bind(xProperty.add(length));
+            l.endYProperty().bind(yProperty);
+            break;
+        }
+        
+
+        graphics.getChildren().addAll(c,l);
 
         graphics.addEventHandler(MouseEvent.MOUSE_ENTERED, evt -> {
             if (isInput)
@@ -60,6 +91,14 @@ public class Pin {
 
     public DoubleProperty yProperty() {
         return yProperty;
+    }
+
+    public DoubleProperty anchorX() {
+        return c.centerXProperty();
+    }
+
+    public DoubleProperty anchorY() {
+        return c.centerYProperty();
     }
 
 }
