@@ -3,6 +3,8 @@ package hu.uni_pannon.sim.exp;
 import javafx.scene.Group;
 import javafx.scene.input.MouseEvent;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
@@ -17,6 +19,7 @@ public class GraphicalComponent {
     private Group graphics;
     private double size = 50;
     private Workspace parent;
+    private boolean dragging;
 
     private double prevX, prevY;
 
@@ -26,11 +29,13 @@ public class GraphicalComponent {
     // model
     private Component model;
     private Map<String,Pin> pins;
+    private List<String> wires;
 
     public GraphicalComponent(String id, Workspace parent, Component model) {
         this.id = id;
         this.parent = parent;
         this.model = model;
+        this.wires = new LinkedList<>();
         xProperty = new SimpleDoubleProperty();
         yProperty = new SimpleDoubleProperty();
 
@@ -66,11 +71,17 @@ public class GraphicalComponent {
             parent.componentActivity(ActivityType.ACT_EXIT, this.id);
         });
         graphics.addEventHandler(MouseEvent.MOUSE_PRESSED, evt -> {
-            parent.componentActivity(ActivityType.ACT_PRESS, this.id);
+            if (evt.isSecondaryButtonDown()) {
+                remove();
+            } else {
+                parent.componentActivity(ActivityType.ACT_PRESS, this.id);
 
-            // drag start
-            prevX = evt.getX();
-            prevY = evt.getY();
+                // drag start
+                prevX = evt.getX();
+                prevY = evt.getY();
+                dragging = true;
+                parent.setComponentMoving(true);
+            }
         });
         // drag continue
         graphics.addEventHandler(MouseEvent.MOUSE_DRAGGED, evt -> {
@@ -82,6 +93,12 @@ public class GraphicalComponent {
 
             prevX = evt.getX();
             prevY = evt.getY();
+        });
+        graphics.addEventHandler(MouseEvent.MOUSE_RELEASED, evt -> {
+            if (dragging) {
+                dragging = false;
+                parent.setComponentMoving(false);
+            }
         });
     }
     
@@ -110,6 +127,18 @@ public class GraphicalComponent {
             return Optional.of(pins.get(id));
         else
             return Optional.empty();
+    }
+
+    public void addWire(String w) {
+        wires.add(w);
+    }
+
+    public void remove() {
+        parent.removeComponent(this);
+    }
+
+    public List<String> getWires() {
+        return wires;
     }
 
 }

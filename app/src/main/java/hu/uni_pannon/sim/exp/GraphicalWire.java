@@ -32,8 +32,12 @@ public class GraphicalWire {
 
             line.addEventHandler(MouseEvent.MOUSE_PRESSED, evt -> {
                 int idx = GraphicalWire.this.segments.indexOf(this);
-                if (idx != -1)  // this is the default error value... so nice of you Java API
-                    GraphicalWire.this.segmentAcivity(ActivityType.ACT_PRESS, idx, evt.getX(), evt.getY());
+                if (idx != -1) {  // this is the default error value... so nice of you Java API 
+                    if (evt.isSecondaryButtonDown())
+                        remove();
+                    else
+                        GraphicalWire.this.segmentAcivity(ActivityType.ACT_PRESS, idx, evt.getX(), evt.getY());
+                }
             });
             line.addEventHandler(MouseEvent.MOUSE_ENTERED, evt -> {
                 int idx = GraphicalWire.this.segments.indexOf(this);
@@ -49,6 +53,10 @@ public class GraphicalWire {
                 int idx = GraphicalWire.this.segments.indexOf(this);
                 if (idx != -1)  // this is the default error value... so nice of you Java API
                     GraphicalWire.this.segmentAcivity(ActivityType.ACT_DRAG, idx, evt.getX(), evt.getY());
+                workspace.setComponentMoving(true);
+            });
+            line.addEventHandler(MouseEvent.MOUSE_RELEASED, evt -> {
+                workspace.setComponentMoving(false);
             });
         }
     }
@@ -63,11 +71,16 @@ public class GraphicalWire {
 
     private boolean drawingLine;
 
-    public GraphicalWire(Workspace workspace) {
+    public GraphicalWire(Workspace workspace, String id) {
+        this.id = id;
         this.model = new Wire();
         this.workspace = workspace;
         this.segments = new LinkedList<>();
         drawingLine = false;
+    }
+
+    public String getId() {
+        return id;
     }
 
     public boolean isDrawingLine() {
@@ -86,7 +99,6 @@ public class GraphicalWire {
             dragSegment(segmentIndex, x, y);
             break;
         default:
-            System.out.println("Line segment activity at " + segmentIndex);
             break;
         }
     }
@@ -127,7 +139,6 @@ public class GraphicalWire {
             });
             break;
         case VERTICAL:
-            System.out.println("Current is vertical");
             current.line.setStartX(x);
             current.line.setEndX(x);
             prev.ifPresent(seg -> {
@@ -354,5 +365,23 @@ public class GraphicalWire {
             return Optional.empty();
         else
             return Optional.of(segments.get(segments.size()-1));
+    }
+
+    // graphical deletion
+    public void remove() {
+        Optional<Segment> first = neighbourOf(0);
+        first.ifPresent(seg -> {
+            seg.line.startXProperty().unbind();
+            seg.line.startYProperty().unbind();
+        });
+        Optional<Segment> last = neighbourOf(segments.size()-1);
+        last.ifPresent(seg -> {
+            seg.line.endXProperty().unbind();
+            seg.line.endYProperty().unbind();
+        });
+
+        for (Segment s : segments) {
+            workspace.getChildren().remove(s.line);
+        }
     }
 }

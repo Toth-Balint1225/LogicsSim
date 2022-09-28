@@ -3,7 +3,6 @@ package hu.uni_pannon.sim.exp;
 
 import java.util.List;
 
-import com.google.common.graph.Graph;
 
 import javafx.scene.Group;
 import javafx.scene.paint.Color;

@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import hu.uni_pannon.sim.logic.Component;
-import hu.uni_pannon.sim.logic.InvalidParamException;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.Group;

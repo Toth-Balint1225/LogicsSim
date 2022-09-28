@@ -9,6 +9,7 @@ import hu.uni_pannon.sim.logic.Component;
 import hu.uni_pannon.sim.logic.gates.AndGate;
 import hu.uni_pannon.sim.logic.gates.NotGate;
 import hu.uni_pannon.sim.logic.gates.OrGate;
+import hu.uni_pannon.sim.logic.gates.XnorGate;
 import javafx.scene.Group;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
@@ -20,17 +21,29 @@ public final class Workspace extends Group {
 
     private final Rectangle background;
     private final Map<String,GraphicalComponent> components;
+    private final Map<String,GraphicalWire> wires;
 
     private boolean drawingSelection = false;
     private boolean selectionPresent = false;
     private boolean hoveringOnComponent = false;
+    private boolean movingComponent = false;
+    private boolean drawingWire = false;
 
     private Line[] tempLines = new Line[4];
 
     private GraphicalWire nextWire;
 
+    private static int wireNumber = 0;
+    private static int componentNumber = 0;
+    private static String componentId() {
+        return String.format("component%d", componentNumber++);
+    }
+    private static String wireId() {
+        return String.format("wire%d", wireNumber++);
+    }
+
     public Workspace(Pane p) {
-        nextWire = new GraphicalWire(this);
+        nextWire = new GraphicalWire(this,wireId());
         p.getChildren().add(this);
 
         background = new Rectangle();
@@ -38,14 +51,17 @@ public final class Workspace extends Group {
         getChildren().add(background);
         
         components = new TreeMap<>();
+        wires = new TreeMap<>();
 
         // test
-        Component c = new AndGate(2);
+        Component c = new AndGate(3);
         Component c2 = new OrGate(2);
         Component c3 = new NotGate();
+        Component c4 = new XnorGate(2);
         GraphicalComponent g1 = new GraphicalComponent("and1",this,c);
         GraphicalComponent g2 = new GraphicalComponent("or1",this,c2);
-        GraphicalComponent g3 = new GraphicalComponent("buf",this,c3);
+        GraphicalComponent g3 = new GraphicalComponent("not1",this,c3);
+        GraphicalComponent g4 = new GraphicalComponent("xnor1", this, c4);
         
         g1.xProperty().set(50);
         g1.yProperty().set(100);
@@ -53,16 +69,20 @@ public final class Workspace extends Group {
         g2.yProperty().set(300);
         g3.xProperty().set(100);
         g3.yProperty().set(150);
-        GraphicsFactory.giveOr(g1);
-        GraphicsFactory.giveXnor(g2);
-        GraphicsFactory.giveBuffer(g3);
+        g4.xProperty().set(200);
+        g4.yProperty().set(200);
+        GraphicsFactory.giveAnd(g1);
+        GraphicsFactory.giveOr(g2);
+        GraphicsFactory.giveNot(g3);
+        GraphicsFactory.giveXnor(g4);
         addComponent(g1);
         addComponent(g2);
         addComponent(g3);
+        addComponent(g4);
 
 
         p.addEventHandler(MouseEvent.MOUSE_DRAGGED, evt -> {
-            if (hoveringOnComponent) 
+            if (hoveringOnComponent || movingComponent || drawingWire) 
                 return;
         
             if (!drawingSelection) {
@@ -131,6 +151,13 @@ public final class Workspace extends Group {
             return Optional.empty();
     }
 
+    public Optional<GraphicalWire> getWireById(String id) {
+        if (wires.containsKey(id)) 
+            return Optional.of(wires.get(id));
+        else
+            return Optional.empty();
+    }
+
 
     public void componentPinActivity(ActivityType type, String compId, String pinId, boolean input) {
         switch (type) {
@@ -138,8 +165,14 @@ public final class Workspace extends Group {
                 if (input && nextWire.isDrawingLine()) {
                     getComponentById(compId).ifPresent(c -> {
                             c.getPinById(pinId).ifPresent(p -> {
+                                // finish the current wire
                                 nextWire.finishLine(p.anchorX(),p.anchorY(),c.getModel(),pinId);
-                                nextWire = new GraphicalWire(this);
+                                // add to the finish component
+                                c.addWire(nextWire.getId());
+                                // create the new wire
+                                wires.put(nextWire.getId(),nextWire);
+                                nextWire = new GraphicalWire(this, wireId());
+                                drawingWire = false;
                             });
                         });
                 } 
@@ -147,6 +180,9 @@ public final class Workspace extends Group {
                     getComponentById(compId).ifPresent(c -> {
                             c.getPinById(pinId).ifPresent(p -> {
                                 nextWire.startLine(p.anchorX(),p.anchorY(),c.getModel(),pinId);
+                                // add to the component
+                                c.addWire(nextWire.getId());
+                                drawingWire = true;
                             });
                         });
                 } 
@@ -160,11 +196,9 @@ public final class Workspace extends Group {
     public void componentActivity(ActivityType type, String compId) {
         switch (type) {
             case ACT_ENTER:
-                System.out.println("Mouse entered component " + compId);
                 hoveringOnComponent = true;
                 break;
             case ACT_EXIT:
-                System.out.println("Mouse exited component " + compId);
                 hoveringOnComponent = false;
                 break;
             default:
@@ -172,5 +206,23 @@ public final class Workspace extends Group {
         }
     }
 
+    public void setComponentMoving(boolean val) {
+        this.movingComponent = val;
+    }
+
+    public void removeComponent(GraphicalComponent c) {
+        components.remove(c.getId());
+        getChildren().remove(c.getGraphics());
+        for (String wire : c.getWires()) {
+            removeWire(wire);
+        }
+    }
+
+    public void removeWire(String id) {
+        Optional<GraphicalWire> wire = getWireById(id);
+        wire.ifPresent(w -> {
+            w.remove();
+        });
+    }
 
 }
