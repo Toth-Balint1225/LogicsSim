@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
 
+import hu.uni_pannon.sim.data.WorkspaceData;
 import hu.uni_pannon.sim.logic.Component;
 import hu.uni_pannon.sim.logic.gates.AndGate;
 import hu.uni_pannon.sim.logic.gates.NotGate;
@@ -19,19 +20,23 @@ import javafx.scene.shape.Rectangle;
 
 public final class Workspace extends Group {
 
+    // graphics
     private final Rectangle background;
     private final Map<String,GraphicalComponent> components;
     private final Map<String,GraphicalWire> wires;
+    private Line[] tempLines = new Line[4];
+    private GraphicalWire nextWire;
+    private Pane pane;
 
+    private String name;
+
+    // state flags
     private boolean drawingSelection = false;
     private boolean selectionPresent = false;
     private boolean hoveringOnComponent = false;
     private boolean movingComponent = false;
     private boolean drawingWire = false;
 
-    private Line[] tempLines = new Line[4];
-
-    private GraphicalWire nextWire;
 
     private static int wireNumber = 0;
     private static int componentNumber = 0;
@@ -42,10 +47,9 @@ public final class Workspace extends Group {
         return String.format("wire%d", wireNumber++);
     }
 
-    public Workspace(Pane p) {
+    public Workspace() {
         nextWire = new GraphicalWire(this,wireId());
-        p.getChildren().add(this);
-
+        this.pane = new Pane();
         background = new Rectangle();
         background.setFill(Color.LIGHTGREY);
         getChildren().add(background);
@@ -53,35 +57,9 @@ public final class Workspace extends Group {
         components = new TreeMap<>();
         wires = new TreeMap<>();
 
-        // test
-        Component c = new AndGate(3);
-        Component c2 = new OrGate(2);
-        Component c3 = new NotGate();
-        Component c4 = new XnorGate(2);
-        GraphicalComponent g1 = new GraphicalComponent("and1",this,c);
-        GraphicalComponent g2 = new GraphicalComponent("or1",this,c2);
-        GraphicalComponent g3 = new GraphicalComponent("not1",this,c3);
-        GraphicalComponent g4 = new GraphicalComponent("xnor1", this, c4);
-        
-        g1.xProperty().set(50);
-        g1.yProperty().set(100);
-        g2.xProperty().set(300);
-        g2.yProperty().set(300);
-        g3.xProperty().set(100);
-        g3.yProperty().set(150);
-        g4.xProperty().set(200);
-        g4.yProperty().set(200);
-        GraphicsFactory.giveAnd(g1);
-        GraphicsFactory.giveOr(g2);
-        GraphicsFactory.giveNot(g3);
-        GraphicsFactory.giveXnor(g4);
-        addComponent(g1);
-        addComponent(g2);
-        addComponent(g3);
-        addComponent(g4);
 
-
-        p.addEventHandler(MouseEvent.MOUSE_DRAGGED, evt -> {
+        pane.getChildren().add(this);
+        pane.addEventHandler(MouseEvent.MOUSE_DRAGGED, evt -> {
             if (hoveringOnComponent || movingComponent || drawingWire) 
                 return;
         
@@ -117,12 +95,12 @@ public final class Workspace extends Group {
             tempLines[3].setEndY(evt.getY());
         });
 
-        p.addEventHandler(MouseEvent.MOUSE_RELEASED, evt -> {
+        pane.addEventHandler(MouseEvent.MOUSE_RELEASED, evt -> {
             drawingSelection = false;
             selectionPresent = true;
         });
 
-        p.addEventHandler(MouseEvent.MOUSE_PRESSED, evt -> {
+        pane.addEventHandler(MouseEvent.MOUSE_PRESSED, evt -> {
             if (selectionPresent)
                 getChildren().removeAll(tempLines);
             selectionPresent = false;
@@ -133,11 +111,28 @@ public final class Workspace extends Group {
             }
         });
 
-        p.addEventHandler(MouseEvent.MOUSE_MOVED, evt -> {
+        pane.addEventHandler(MouseEvent.MOUSE_MOVED, evt -> {
             if (nextWire.isDrawingLine())
                 nextWire.follow(evt.getX(),evt.getY());
         });
     }
+
+    public Pane getPane() {
+        return pane;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Map<String,GraphicalWire> getWires() {
+        return wires;
+    }
+
 
     public void addComponent(GraphicalComponent c) {
         components.put(c.getId(),c);
@@ -166,7 +161,7 @@ public final class Workspace extends Group {
                     getComponentById(compId).ifPresent(c -> {
                             c.getPinById(pinId).ifPresent(p -> {
                                 // finish the current wire
-                                nextWire.finishLine(p.anchorX(),p.anchorY(),c.getModel(),pinId);
+                                nextWire.finishLine(p.anchorX(),p.anchorY(),c.getModel(),pinId,compId);
                                 // add to the finish component
                                 c.addWire(nextWire.getId());
                                 // create the new wire
@@ -179,7 +174,7 @@ public final class Workspace extends Group {
                 if (!(input || nextWire.isDrawingLine())){
                     getComponentById(compId).ifPresent(c -> {
                             c.getPinById(pinId).ifPresent(p -> {
-                                nextWire.startLine(p.anchorX(),p.anchorY(),c.getModel(),pinId);
+                                nextWire.startLine(p.anchorX(),p.anchorY(),c.getModel(),pinId,compId);
                                 // add to the component
                                 c.addWire(nextWire.getId());
                                 drawingWire = true;
@@ -222,7 +217,49 @@ public final class Workspace extends Group {
         Optional<GraphicalWire> wire = getWireById(id);
         wire.ifPresent(w -> {
             w.remove();
+            wires.remove(id);
         });
+    }
+
+    public WorkspaceData toData() {
+        WorkspaceData res = new WorkspaceData();
+        res.name = this.name;
+        res.height = pane.getPrefHeight();
+        res.width = pane.getPrefWidth();
+        res.components = new WorkspaceData.Component[components.size()];
+        int i = 0;
+        for (Map.Entry<String,GraphicalComponent> it : components.entrySet()) {
+            WorkspaceData.Component c = new WorkspaceData.Component();
+            c.id = it.getValue().getId();
+            c.position = new WorkspaceData.Position();
+            c.position.x = it.getValue().xProperty().get();
+            c.position.y = it.getValue().yProperty().get(); 
+            c.type = it.getValue().getTypeString();
+            if (c.type.equals("CUSTOM")) {
+                // do some special and actually serialize the lookup table
+            } else {
+                // in this case we only need the inputs
+                c.inputs = it.getValue().getModel().getLUT().inputs().size();
+            }
+            res.components[i++] = c;
+        }
+
+        // wires
+        res.wires = new WorkspaceData.Wire[wires.size()];
+        i = 0;
+        for (Map.Entry<String,GraphicalWire> it : wires.entrySet()) {
+            WorkspaceData.Wire w = new WorkspaceData.Wire();
+            w.id = it.getKey();
+            w.from = new WorkspaceData.Connection();
+            w.to= new WorkspaceData.Connection();
+            w.from.component = it.getValue().inComp();
+            w.from.pin= it.getValue().inPin();
+            w.to.component = it.getValue().outComp();
+            w.to.pin= it.getValue().outPin();
+            res.wires[i++] = w;
+            w.segments = it.getValue().getSegmentPoints().stream().toArray(WorkspaceData.Position[]::new);
+        }
+        return res;
     }
 
 }

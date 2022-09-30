@@ -23,6 +23,8 @@ dependencies {
 
     // This dependency is used by the application.
     implementation 'com.google.guava:guava:29.0-jre'
+    // some epic json features
+    implementation 'com.google.code.gson:gson:2.9.0'
 }
 
 application {

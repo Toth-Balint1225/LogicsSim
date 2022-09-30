@@ -4,6 +4,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.security.auth.x500.X500Principal;
+
+import hu.uni_pannon.sim.data.WorkspaceData;
 import hu.uni_pannon.sim.logic.Component;
 import hu.uni_pannon.sim.logic.Wire;
 import javafx.beans.property.DoubleProperty;
@@ -68,6 +71,10 @@ public class GraphicalWire {
     private Workspace workspace;
     private Wire model;
     private String id;
+    private String inComp;
+    private String outComp;
+    private String inPin;
+    private String outPin;
 
     private boolean drawingLine;
 
@@ -102,6 +109,36 @@ public class GraphicalWire {
             break;
         }
     }
+
+    public Wire getModel() {
+        return model;
+    }
+
+    public String inComp() {
+        return inComp;
+    }
+    public String inPin() {
+        return inPin;
+    }
+    public String outComp() {
+        return outComp;
+    }
+    public String outPin() {
+        return outPin;
+    }
+
+    public List<WorkspaceData.Position> getSegmentPoints() { 
+        List<WorkspaceData.Position> res = new LinkedList<>();
+        for (Segment s : segments) {
+            WorkspaceData.Position pos = new WorkspaceData.Position();
+            pos.x = s.line.getStartX();
+            pos.y = s.line.getStartY();
+            res.add(pos);
+        }
+        res.remove(0);
+        return res;
+    }
+
 
     private void color(Paint color) {
         for (Segment s : segments) {
@@ -202,9 +239,11 @@ public class GraphicalWire {
         nextSegment.fix = false;
 	}
 
-	public void startLine(DoubleProperty x, DoubleProperty y, Component comp, String pinId) {
+	public void startLine(DoubleProperty x, DoubleProperty y, Component comp, String pinId, String compId) {
         // model thing
         model.addInput(pinId, comp);
+        inPin = pinId;
+        inComp = compId;
 
         // graphics init
 		drawingLine = true;
@@ -221,8 +260,11 @@ public class GraphicalWire {
         nextSegment.fix = true;
 	}
 
-	public void finishLine(DoubleProperty x, DoubleProperty y, Component comp, String pinId) {
+	public void finishLine(DoubleProperty x, DoubleProperty y, Component comp, String pinId, String compId) {
         model.to(pinId, comp);
+        outPin = pinId;
+        outComp = compId;
+
         if (x.get() != startX || y.get() != startY) {
             // connect them with something temp
             double distX = startX - x.get();
@@ -383,5 +425,7 @@ public class GraphicalWire {
         for (Segment s : segments) {
             workspace.getChildren().remove(s.line);
         }
+
+        workspace.getWires().remove(id);
     }
 }

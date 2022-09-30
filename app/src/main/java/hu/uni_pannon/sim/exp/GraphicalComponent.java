@@ -30,6 +30,7 @@ public class GraphicalComponent {
     private Component model;
     private Map<String,Pin> pins;
     private List<String> wires;
+    private String typeString;
 
     public GraphicalComponent(String id, Workspace parent, Component model) {
         this.id = id;
@@ -42,6 +43,14 @@ public class GraphicalComponent {
         graphics = new Group();
         
         pins = new TreeMap<>();
+    }
+
+    public void setTypeString(String type) {
+        this.typeString = type;
+    }
+
+    public String getTypeString() {
+        return this.typeString;
     }
 
     public void addPin(String id, Pin p) {

@@ -288,4 +288,36 @@ public class GraphicsFactory {
     public Group giveCustom(GraphicalComponent c) {
         return new Group();
     }
+
+    public static boolean giveFromString(GraphicalComponent c, String id) {
+        switch (id) {
+            case "AND":
+                giveAnd(c);
+                break;
+            case "OR":
+                giveOr(c);
+                break;
+            case "NOT":
+                giveNot(c);
+                break;
+            case "XOR":
+                giveXor(c);
+                break;
+            case "NAND":
+                giveNand(c);
+                break;
+            case "NOR":
+                giveNor(c);
+                break;
+            case "XNOR":
+                giveXnor(c);
+                break;
+            case "BUFFER":
+                giveBuffer(c);
+                break;
+            default:
+                return false;
+        }
+        return true;
+    }
 }
