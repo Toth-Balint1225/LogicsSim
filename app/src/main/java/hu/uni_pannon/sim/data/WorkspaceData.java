@@ -112,7 +112,7 @@ public class WorkspaceData {
 
     private static void addCustomComponent(Component c, Workspace ws) {
         // we have a custom component here defined with a LUT
-        if (c.lut != null) {
+        if (c.lut != null && c.pins != null && c.name != null) {
             // generate a component 
             hu.uni_pannon.sim.logic.Component comp = 
                 new hu.uni_pannon.sim.logic.Component(Arrays.asList(c.lut.inputs)
@@ -122,21 +122,19 @@ public class WorkspaceData {
                 try {
                     comp.getLUT().addEntry(Arrays.asList(e.lhs),Arrays.asList(e.rhs));
                 } catch (Exception ex) {
-                    // TODO: give user-readable errors and suggestions on how to fix it
                     // here it should stop creating the component
                     System.err.println("Error happened");
                     ex.printStackTrace();
                 }
             }
-
-            // TODO: Continue from here
+            comp.getLUT().print();
             GraphicalComponent gc = new GraphicalComponent(c.id,ws,comp);
             // get the graphics for gc
-            // GraphicsFactory.giveCustom(gc,c.pins)
+            GraphicsFactory.giveCustom(gc,c.name,c.pins,comp.getLUT());
             gc.xProperty().set(c.position.x);
             gc.yProperty().set(c.position.y);
             gc.setTypeString(c.type);
-            //ws.addComponent(gc);
+            ws.addComponent(gc);
         }
     }
 

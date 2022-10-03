@@ -37,18 +37,35 @@ public final class Workspace extends Group {
     private boolean movingComponent = false;
     private boolean drawingWire = false;
 
+    private static final int wireLimit = 100;
 
-    private static int wireNumber = 0;
-    private static int componentNumber = 0;
-    private static String componentId() {
-        return String.format("component%d", componentNumber++);
+    private String componentId() {
+        int compNumber = 0;
+        boolean found = false;
+        while (!found && compNumber <= components.size()) {
+            if (!components.containsKey(String.format("component%d", compNumber)))
+                found = true;
+            else
+                compNumber++;
+        }
+        return String.format("component%d", compNumber);
     }
-    private static String wireId() {
-        return String.format("wire%d", wireNumber++);
+
+    private String wireId() {
+        int wireNumber = 0;
+        boolean found = false;
+        while (!found && wireNumber <= wires.size()) {
+            if (!wires.containsKey(String.format("wire%d", wireNumber)))
+                found = true;
+            else
+                wireNumber++;
+        }
+        System.out.println("Wire number: " + wireNumber);
+        return String.format("wire%d", wireNumber);
     }
+    
 
     public Workspace() {
-        nextWire = new GraphicalWire(this,wireId());
         this.pane = new Pane();
         background = new Rectangle();
         background.setFill(Color.LIGHTGREY);
@@ -57,6 +74,7 @@ public final class Workspace extends Group {
         components = new TreeMap<>();
         wires = new TreeMap<>();
 
+        nextWire = new GraphicalWire(this,"");
 
         pane.getChildren().add(this);
         pane.addEventHandler(MouseEvent.MOUSE_DRAGGED, evt -> {
@@ -174,6 +192,7 @@ public final class Workspace extends Group {
                 if (!(input || nextWire.isDrawingLine())){
                     getComponentById(compId).ifPresent(c -> {
                             c.getPinById(pinId).ifPresent(p -> {
+                                nextWire = new GraphicalWire(this,wireId());
                                 nextWire.startLine(p.anchorX(),p.anchorY(),c.getModel(),pinId,compId);
                                 // add to the component
                                 c.addWire(nextWire.getId());

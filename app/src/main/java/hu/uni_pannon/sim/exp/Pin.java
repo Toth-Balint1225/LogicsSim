@@ -10,7 +10,7 @@ import javafx.scene.shape.Line;
 
 public class Pin {
 
-    private String id;
+    String id;
     private Circle c;
     private Line l;
     private GraphicalComponent parent;
