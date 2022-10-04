@@ -38,14 +38,18 @@ public class WorkspaceData {
         public LUTEntry[] entries;
     }
 
+    public static class Type {
+        public String name;
+        public LUT lut;           
+        public Pin[] pins;       
+    }
+
     public static class Component {
-        public String id;          // not null
-        public String name;        // can be null
-        public LUT lut;            // can be null
-        public double inputs;      // can be null
-        public Position position;  // not null
-        public String type;        // not null
-        public Pin[] pins;         // can be null
+        public String id;          
+        public String name;        
+        public double inputs;      
+        public Position position;  
+        public String type;       
     }
 
     public static class Wire {
@@ -63,6 +67,7 @@ public class WorkspaceData {
     public String name;
     public double height;
     public double width;
+    public Type[] types;
     public Component[] components;
     public Wire[] wires;
 
@@ -110,15 +115,17 @@ public class WorkspaceData {
         return Optional.of(ws);     
     }
 
-    private static void addCustomComponent(Component c, Workspace ws) {
+    private void addCustomComponent(Component c, Workspace ws) {
         // we have a custom component here defined with a LUT
-        if (c.lut != null && c.pins != null && c.name != null) {
+        if (c.name == null) 
+            return;
+        getTypeByName(c.name).ifPresent(type -> {
             // generate a component 
             hu.uni_pannon.sim.logic.Component comp = 
-                new hu.uni_pannon.sim.logic.Component(Arrays.asList(c.lut.inputs)
-                                                        ,Arrays.asList(c.lut.outputs));
+                new hu.uni_pannon.sim.logic.Component(Arrays.asList(type.lut.inputs)
+                                                        ,Arrays.asList(type.lut.outputs));
             // fill in the lookup table with entries
-            for (LUTEntry e : c.lut.entries) {
+            for (LUTEntry e : type.lut.entries) {
                 try {
                     comp.getLUT().addEntry(Arrays.asList(e.lhs),Arrays.asList(e.rhs));
                 } catch (Exception ex) {
@@ -130,15 +137,15 @@ public class WorkspaceData {
             comp.getLUT().print();
             GraphicalComponent gc = new GraphicalComponent(c.id,ws,comp);
             // get the graphics for gc
-            GraphicsFactory.giveCustom(gc,c.name,c.pins,comp.getLUT());
+            GraphicsFactory.giveCustom(gc,c.name,type.pins,comp.getLUT());
             gc.xProperty().set(c.position.x);
             gc.yProperty().set(c.position.y);
             gc.setTypeString(c.type);
             ws.addComponent(gc);
-        }
+        });
     }
 
-    private static void addStandardGate(Component c, Workspace ws) {
+    private void addStandardGate(Component c, Workspace ws) {
         if (c.inputs > 0) {
             GateFactory.fromString(c.type, (int)c.inputs).ifPresent(comp -> {
                 // we have a gate here
@@ -151,5 +158,18 @@ public class WorkspaceData {
                 }
             });
         }
+    }
+
+    public Optional<Type> getTypeByName(String name) {
+        Type[] res = Arrays.stream(types)
+            .filter(t -> {
+                if (t.name.equals(name))
+                    return true;
+                else return false;
+            }).toArray(Type[]::new);
+        if (res.length > 0)
+            return Optional.of(res[0]);
+        else
+            return Optional.empty();
     }
 }

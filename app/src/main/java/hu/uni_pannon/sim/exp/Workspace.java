@@ -256,6 +256,8 @@ public final class Workspace extends Group {
             c.type = it.getValue().getTypeString();
             if (c.type.equals("CUSTOM")) {
                 // do some special and actually serialize the lookup table
+                // TODO: implement this
+                // somehow the graphical object needs to store some optional pin layout
             } else {
                 // in this case we only need the inputs
                 c.inputs = it.getValue().getModel().getLUT().inputs().size();
