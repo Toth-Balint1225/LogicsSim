@@ -1,6 +1,8 @@
 package hu.uni_pannon.sim.exp;
 
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
@@ -245,23 +247,38 @@ public final class Workspace extends Group {
         res.name = this.name;
         res.height = pane.getPrefHeight();
         res.width = pane.getPrefWidth();
+        List<WorkspaceData.Type> typeBuffer = new LinkedList<>();
         res.components = new WorkspaceData.Component[components.size()];
         int i = 0;
         for (Map.Entry<String,GraphicalComponent> it : components.entrySet()) {
             WorkspaceData.Component c = new WorkspaceData.Component();
             c.id = it.getValue().getId();
+            it.getValue().getName().ifPresent(name -> {
+                c.name = name;
+            });
             c.position = new WorkspaceData.Position();
             c.position.x = it.getValue().xProperty().get();
             c.position.y = it.getValue().yProperty().get(); 
             c.type = it.getValue().getTypeString();
             if (c.type.equals("CUSTOM")) {
-                // do some special and actually serialize the lookup table
-                // TODO: implement this
-                // somehow the graphical object needs to store some optional pin layout
+                // if the type is already saved, do nothing
+                it.getValue().getPinLocations().ifPresent(pins -> {
+                    if (typeBuffer.stream()
+                            .filter(t -> t.name.equals(c.name))
+                            .mapToInt(x -> 1)
+                            .reduce(0,Integer::sum) == 0) {
+                        WorkspaceData.Type type = new WorkspaceData.Type();
+                        type.name = c.name;
+                        type.pins = pins;
+                        type.lut = it.getValue().getModel().getLUT().toData();
+                        typeBuffer.add(type);
+                    }
+                });
             } else {
                 // in this case we only need the inputs
                 c.inputs = it.getValue().getModel().getLUT().inputs().size();
             }
+            res.types = typeBuffer.stream().toArray(WorkspaceData.Type[]::new);
             res.components[i++] = c;
         }
 

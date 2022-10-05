@@ -136,8 +136,10 @@ public class WorkspaceData {
             }
             comp.getLUT().print();
             GraphicalComponent gc = new GraphicalComponent(c.id,ws,comp);
+            gc.setPinLocaions(type.pins);
+            gc.setName(c.name);
             // get the graphics for gc
-            GraphicsFactory.giveCustom(gc,c.name,type.pins,comp.getLUT());
+            GraphicsFactory.giveCustom(gc,type.pins,comp.getLUT());
             gc.xProperty().set(c.position.x);
             gc.yProperty().set(c.position.y);
             gc.setTypeString(c.type);

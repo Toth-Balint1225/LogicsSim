@@ -60,7 +60,7 @@ public class Pin {
         }
         
 
-        graphics.getChildren().addAll(c,l);
+        graphics.getChildren().addAll(l,c);
 
         graphics.addEventHandler(MouseEvent.MOUSE_ENTERED, evt -> {
             if (isInput)

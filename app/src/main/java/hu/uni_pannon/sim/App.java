@@ -63,7 +63,7 @@ public class App extends Application {
                 primaryStage.setScene(new Scene(ws.getPane()));
                 primaryStage.sizeToScene();
                 primaryStage.setOnHidden(evt -> {
-                    //Serializer.writeToFile(ws.toData(), filename);
+                    Serializer.writeToFile(ws.toData(), filename);
                 });
                 primaryStage.show();
             });

@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
 
+import hu.uni_pannon.sim.data.WorkspaceData;
 import hu.uni_pannon.sim.logic.Component;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -31,11 +32,14 @@ public class GraphicalComponent {
     private Map<String,Pin> pins;
     private List<String> wires;
     private String typeString;
+    private Optional<WorkspaceData.Pin[]> pinLocations;
+    private String name;
 
     public GraphicalComponent(String id, Workspace parent, Component model) {
         this.id = id;
         this.parent = parent;
         this.model = model;
+        this.pinLocations = Optional.empty();
         this.wires = new LinkedList<>();
         xProperty = new SimpleDoubleProperty();
         yProperty = new SimpleDoubleProperty();
@@ -43,6 +47,14 @@ public class GraphicalComponent {
         graphics = new Group();
         
         pins = new TreeMap<>();
+    }
+
+    public void setPinLocaions(WorkspaceData.Pin[] pins) {
+        this.pinLocations = Optional.of(pins);
+    }
+
+    public Optional<WorkspaceData.Pin[]> getPinLocations() {
+        return this.pinLocations;
     }
 
     public void setTypeString(String type) {
@@ -121,6 +133,17 @@ public class GraphicalComponent {
 
     public double getSize() {
         return size;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+    
+    public Optional<String> getName() {
+        if (name != null)
+            return Optional.of(name);
+        else
+            return Optional.empty();
     }
 
     public void pinActivity(ActivityType type, String pinId, boolean input) {

@@ -291,7 +291,7 @@ public class GraphicsFactory {
         pinsOr(c, true);
     }
 
-    public static void giveCustom(GraphicalComponent c, String name, WorkspaceData.Pin[] pins, LookupTable lut) {
+    public static void giveCustom(GraphicalComponent c, WorkspaceData.Pin[] pins, LookupTable lut) {
         // base
         Group res = new Group();
         Rectangle rect = new Rectangle();
@@ -333,7 +333,11 @@ public class GraphicsFactory {
         rect.setHeight(heightCount * c.getSize());
         rect.setWidth(widthCount * c.getSize());
 
-        Label nameLab = new Label(name);
+        if (!c.getName().isPresent()) {
+            System.out.println("Name not found " + c.getTypeString());
+            return;
+        }
+        Label nameLab = new Label(c.getName().get());
         nameLab.align(HPos.CENTER, VPos.CENTER);
         nameLab.position(c.xProperty().add((widthCount * c.getSize()) / 2), 
                          c.yProperty().add((heightCount * c.getSize()) / 2));
