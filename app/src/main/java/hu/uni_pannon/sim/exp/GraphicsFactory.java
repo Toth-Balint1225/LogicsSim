@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import hu.uni_pannon.sim.data.WorkspaceData;
+import hu.uni_pannon.sim.gui.GraphicalObject;
 import hu.uni_pannon.sim.logic.LookupTable;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
@@ -13,6 +14,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.ArcTo;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Line;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
@@ -131,6 +133,20 @@ public class GraphicsFactory {
 
         Group res = new Group();
         res.getChildren().add(path);
+        return res;
+    }
+
+    private static Group shapeConstant(GraphicalComponent c) {
+        Rectangle rect = new Rectangle();
+        rect.xProperty().bind(c.xProperty());
+        rect.yProperty().bind(c.yProperty());
+        rect.setWidth(c.getSize());
+        rect.setHeight(c.getSize());
+        rect.setFill(background);
+        rect.setStroke(foreground);
+        rect.setStrokeWidth(strokeWidth);
+        Group res = new Group();
+        res.getChildren().add(rect);
         return res;
     }
 
@@ -423,6 +439,120 @@ public class GraphicsFactory {
 
     }
 
+    public static void giveHighConstant(GraphicalComponent c) {
+        Group res = shapeConstant(c);
+        Label l = new Label("1");
+        l.setFont("Arial", FontWeight.BOLD, 24);
+        l.position(c.xProperty().add(c.getSize() / 2),c.yProperty().add(c.getSize() / 2));
+        l.align(HPos.CENTER,VPos.CENTER);
+        res.getChildren().add(l.getNode());
+
+        // add the one pin to rule them all
+        String pinId = c.getModel().getLUT().outputs().get(0);
+        Pin p = new Pin(pinId,c,Direction.RIGHT);
+        p.xProperty().bind(c.xProperty().add(c.getSize()));
+        p.yProperty().bind(c.yProperty().add(c.getSize() / 2));
+        c.addPin(pinId, p);
+        res.getChildren().add(p.getGraphics());
+
+        c.setGraphics(res);
+    }
+
+    public static void giveLowConstant(GraphicalComponent c) {
+        Group res = shapeConstant(c);
+        Label l = new Label("0");
+        l.setFont("Arial", FontWeight.BOLD, 24);
+        l.position(c.xProperty().add(c.getSize() / 2),c.yProperty().add(c.getSize() / 2));
+        l.align(HPos.CENTER,VPos.CENTER);
+        res.getChildren().add(l.getNode());
+
+        // add the one pin to rule them all
+        String pinId = c.getModel().getLUT().outputs().get(0);
+        Pin p = new Pin(pinId,c,Direction.RIGHT);
+        p.xProperty().bind(c.xProperty().add(c.getSize()));
+        p.yProperty().bind(c.yProperty().add(c.getSize() / 2));
+        c.addPin(pinId, p);
+        res.getChildren().add(p.getGraphics());
+
+        c.setGraphics(res);
+    }
+
+    public static void giveInput(GraphicalComponent c) {
+        Group res = shapeConstant(c);
+
+        // add the one pin to rule them all
+        String pinId = c.getModel().getLUT().outputs().get(0);
+        Pin p = new Pin(pinId,c,Direction.RIGHT);
+        p.xProperty().bind(c.xProperty().add(c.getSize()));
+        p.yProperty().bind(c.yProperty().add(c.getSize() / 2));
+        c.addPin(pinId, p);
+        res.getChildren().add(p.getGraphics());
+
+        Circle ccl = new Circle();
+        ccl.centerXProperty().bind(c.xProperty().add(c.getSize() / 2));
+        ccl.centerYProperty().bind(c.yProperty().add(c.getSize() / 2));
+        ccl.setRadius(c.getSize() / 2 - 5);
+        ccl.setStrokeWidth(strokeWidth);
+        ccl.setFill(background);
+        ccl.setStroke(foreground);
+        res.getChildren().add(ccl);
+
+        Circle ccl2 = new Circle();
+        ccl2.centerXProperty().bind(c.xProperty().add(c.getSize() / 2));
+        ccl2.centerYProperty().bind(c.yProperty().add(c.getSize() / 2));
+        ccl2.setRadius(c.getSize() / 2 - 10);
+        ccl2.setStrokeWidth(strokeWidth);
+        ccl2.setFill(background);
+        ccl2.setStroke(foreground);
+        res.getChildren().add(ccl2);
+
+        c.setGraphics(res);
+    }
+
+    public static void giveOutput(GraphicalComponent c) {
+        Group res = new Group();
+
+        Circle ccl = new Circle();
+        ccl.centerXProperty().bind(c.xProperty().add(c.getSize() / 2));
+        ccl.centerYProperty().bind(c.yProperty().add(c.getSize() / 2));
+        ccl.setRadius(c.getSize() / 2);
+        ccl.setStrokeWidth(strokeWidth);
+        ccl.setFill(background);
+        ccl.setStroke(foreground);
+        res.getChildren().add(ccl);
+
+        Line l1 = new Line();
+        l1.startXProperty().bind(c.xProperty().add(c.getSize() / 2));
+        l1.endXProperty().bind(c.xProperty().add(c.getSize() / 2));
+        l1.startYProperty().bind(c.yProperty());
+        l1.endYProperty().bind(c.yProperty().add(c.getSize()));
+        l1.setStroke(foreground);
+        l1.setStrokeWidth(strokeWidth);
+        l1.setRotate(45);
+
+        Line l2 = new Line();
+        l2.startXProperty().bind(c.xProperty());
+        l2.endXProperty().bind(c.xProperty().add(c.getSize()));
+        l2.startYProperty().bind(c.yProperty().add(c.getSize() / 2));
+        l2.endYProperty().bind(c.yProperty().add(c.getSize() / 2));
+        l2.setStroke(foreground);
+        l2.setStrokeWidth(strokeWidth);
+        l2.setRotate(45);
+
+        res.getChildren().addAll(l1,l2);
+
+        // add the one pin to rule them all
+        String pinId = c.getModel().getLUT().outputs().get(0);
+        Pin p = new Pin(pinId,c,Direction.LEFT);
+        p.xProperty().bind(c.xProperty().add(0));
+        p.yProperty().bind(c.yProperty().add(c.getSize() / 2));
+        c.addPin(pinId, p);
+        p.setInput(true);
+        res.getChildren().add(p.getGraphics());
+
+        c.setGraphics(res);
+    }
+
     public static boolean giveFromString(GraphicalComponent c, String id) {
         switch (id) {
             case "AND":
@@ -448,6 +578,18 @@ public class GraphicsFactory {
                 break;
             case "BUFFER":
                 giveBuffer(c);
+                break;
+            case "INPUT":
+                giveInput(c);
+                break;
+            case "OUTPUT":
+                giveOutput(c);
+                break;
+            case "HIGH":
+                giveHighConstant(c);
+                break;
+            case "LOW":
+                giveLowConstant(c);
                 break;
             default:
                 return false;

@@ -3,6 +3,8 @@ package hu.uni_pannon.sim.logic.gates;
 import java.util.Optional;
 
 import hu.uni_pannon.sim.logic.Component;
+import hu.uni_pannon.sim.logic.Input;
+import hu.uni_pannon.sim.logic.Output;
 
 public class GateFactory {
     public static Optional<Component> fromString(String id, int ins) {
@@ -23,6 +25,14 @@ public class GateFactory {
                 return Optional.of(new XnorGate(ins));
             case "BUFFER":
                 return Optional.of(new BufferGate());
+            case "INPUT":
+                return Optional.of(new Input());
+            case "OUTPUT":
+                return Optional.of(new Output());
+            case "HIGH":
+                return Optional.of(new HighConstant());
+            case "LOW":
+                return Optional.of(new LowConstant());
             default:
                 return Optional.empty();
         }
