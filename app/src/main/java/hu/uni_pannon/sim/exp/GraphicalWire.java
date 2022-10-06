@@ -436,4 +436,13 @@ public class GraphicalWire {
             });
         });
     }
+
+    public void update() {
+        model.getActualState(outPin).ifPresent(state -> {
+            if (state)
+                color(Color.BLUE);
+            else
+                color(Color.BLACK);
+        });
+    }
 }

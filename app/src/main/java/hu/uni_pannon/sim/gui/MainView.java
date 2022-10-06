@@ -93,9 +93,9 @@ public class MainView {
 		while (refreshThreadActive) {
 		    evaluate();
 		    try {
-			Thread.sleep(10);
+                Thread.sleep(10);
 		    } catch (Exception e) {
-			e.printStackTrace();
+                e.printStackTrace();
 		    }
 		}
 	});
@@ -249,7 +249,7 @@ public class MainView {
     }
 
     public void evaluate() {
-	model.evaluate();
+        model.evaluate();
         da.updateView(); 
     }
 }

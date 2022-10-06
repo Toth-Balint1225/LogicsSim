@@ -5,6 +5,7 @@ import hu.uni_pannon.sim.data.JsonParser;
 import hu.uni_pannon.sim.data.Serializer;
 import hu.uni_pannon.sim.data.WorkspaceData;
 import hu.uni_pannon.sim.exp.Workspace;
+import hu.uni_pannon.sim.exp.Controller;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -55,20 +56,34 @@ public class App extends Application {
         primaryStage.show();
     }
 
-    @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start5(Stage primaryStage) throws Exception {
         final String filename = "C:/users/tothb/Documents/UNIV/Szakdolgozat/LogicsSimulator/tests.json";
         Serializer.readFromFile(filename).ifPresent(data -> {
             data.toWorkspace().ifPresent(ws -> {
                 primaryStage.setScene(new Scene(ws.getPane()));
                 primaryStage.sizeToScene();
-                //ws.spawnGate("OUTPUT", 2, 100, 100);
                 primaryStage.setOnHidden(evt -> {
                     Serializer.writeToFile(ws.toData(), filename);
                 });
                 primaryStage.show();
             });
         });
+    }
+
+    public void start(Stage primaryStage) throws Exception {
+        primaryStage.setTitle("Logic Simulator");
+        FXMLLoader loader = new FXMLLoader();
+        BorderPane root = loader.load(getClass().getResource("gui/mainview.fxml").openStream());
+        primaryStage.setScene(new Scene(root));
+        primaryStage.sizeToScene();
+        //primaryStage.setMaximized(true);
+
+        Controller controller = (Controller)loader.getController();
+        primaryStage.setOnHidden(evt -> {
+            controller.stopRefreshThread();
+        });
+
+        primaryStage.show();
     }
     
 }

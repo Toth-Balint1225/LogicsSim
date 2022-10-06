@@ -8,7 +8,6 @@ import java.util.Optional;
 import java.util.TreeMap;
 
 import hu.uni_pannon.sim.data.WorkspaceData;
-import hu.uni_pannon.sim.data.WorkspaceData.Component;
 import hu.uni_pannon.sim.logic.Circuit;
 import hu.uni_pannon.sim.logic.gates.GateFactory;
 import javafx.scene.Group;
@@ -60,7 +59,6 @@ public final class Workspace extends Group {
             else
                 wireNumber++;
         }
-        System.out.println("Wire number: " + wireNumber);
         return String.format("wire%d", wireNumber);
     }
     
@@ -271,6 +269,12 @@ public final class Workspace extends Group {
                 gc.setTypeString(type);
             }
         });
+    }
+
+    public void update() {
+        for (Map.Entry<String,GraphicalWire> it : wires.entrySet()) {
+            it.getValue().update();
+        }
     }
 
     public WorkspaceData toData() {

@@ -215,14 +215,14 @@ public class LookupTable {
                 return Optional.empty();
             }
 	    powers[idx] = inputIndexes.get(s);
-	    System.out.println("" + powers[idx]);
+	    //System.out.println("" + powers[idx]);
 	    idx++;
 	}
 
 	int row = Arrays.stream(powers)
 	    .reduce(0,(x,y) -> x + (int)Math.pow(2,y));
 
-	System.out.println("row: " + row);
+	//System.out.println("row: " + row);
 	return Optional.of(row);
 	
 	/*
