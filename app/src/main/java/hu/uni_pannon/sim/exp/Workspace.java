@@ -8,11 +8,9 @@ import java.util.Optional;
 import java.util.TreeMap;
 
 import hu.uni_pannon.sim.data.WorkspaceData;
-import hu.uni_pannon.sim.logic.Component;
-import hu.uni_pannon.sim.logic.gates.AndGate;
-import hu.uni_pannon.sim.logic.gates.NotGate;
-import hu.uni_pannon.sim.logic.gates.OrGate;
-import hu.uni_pannon.sim.logic.gates.XnorGate;
+import hu.uni_pannon.sim.data.WorkspaceData.Component;
+import hu.uni_pannon.sim.logic.Circuit;
+import hu.uni_pannon.sim.logic.gates.GateFactory;
 import javafx.scene.Group;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
@@ -30,7 +28,9 @@ public final class Workspace extends Group {
     private GraphicalWire nextWire;
     private Pane pane;
 
+    // model
     private String name;
+    private Circuit model;
 
     // state flags
     private boolean drawingSelection = false;
@@ -38,8 +38,6 @@ public final class Workspace extends Group {
     private boolean hoveringOnComponent = false;
     private boolean movingComponent = false;
     private boolean drawingWire = false;
-
-    private static final int wireLimit = 100;
 
     private String componentId() {
         int compNumber = 0;
@@ -69,6 +67,9 @@ public final class Workspace extends Group {
 
     public Workspace() {
         this.pane = new Pane();
+
+        this.model = new Circuit();
+
         background = new Rectangle();
         background.setFill(Color.LIGHTGREY);
         getChildren().add(background);
@@ -137,6 +138,10 @@ public final class Workspace extends Group {
         });
     }
 
+    public Circuit getModel() {
+        return model;
+    }
+
     public Pane getPane() {
         return pane;
     }
@@ -153,10 +158,15 @@ public final class Workspace extends Group {
         return wires;
     }
 
+    public Map<String,GraphicalComponent> getComponents() {
+        return components;
+    }
 
     public void addComponent(GraphicalComponent c) {
+        // TODO: check and rename existing
         components.put(c.getId(),c);
         getChildren().add(c.getGraphics());
+        model.add(c.getId(),c.getModel());
     }
 
     public Optional<GraphicalComponent> getComponentById(String id) {
@@ -179,17 +189,18 @@ public final class Workspace extends Group {
             case ACT_PRESS:
                 if (input && nextWire.isDrawingLine()) {
                     getComponentById(compId).ifPresent(c -> {
-                            c.getPinById(pinId).ifPresent(p -> {
-                                // finish the current wire
-                                nextWire.finishLine(p.anchorX(),p.anchorY(),c.getModel(),pinId,compId);
-                                // add to the finish component
-                                c.addWire(nextWire.getId());
-                                // create the new wire
-                                wires.put(nextWire.getId(),nextWire);
-                                nextWire = new GraphicalWire(this, wireId());
-                                drawingWire = false;
-                            });
+                        c.getPinById(pinId).ifPresent(p -> {
+                            // finish the current wire
+                            nextWire.finishLine(p.anchorX(),p.anchorY(),c.getModel(),pinId,compId);
+                            // add to the finish component
+                            c.addWire(nextWire.getId());
+                            model.add(nextWire.getId(), nextWire.getModel());
+                            // create the new wire
+                            wires.put(nextWire.getId(),nextWire);
+                            nextWire = new GraphicalWire(this, wireId());
+                            drawingWire = false;
                         });
+                    });
                 } 
                 if (!(input || nextWire.isDrawingLine())){
                     getComponentById(compId).ifPresent(c -> {
@@ -229,16 +240,36 @@ public final class Workspace extends Group {
     public void removeComponent(GraphicalComponent c) {
         components.remove(c.getId());
         getChildren().remove(c.getGraphics());
+        model.remove(c.getId());
         for (String wire : c.getWires()) {
             removeWire(wire);
         }
+        model.print();
+    }
+
+    public void removeComponent(String id) {
+        getComponentById(id).ifPresent(c -> {
+            c.remove();
+        });
     }
 
     public void removeWire(String id) {
         Optional<GraphicalWire> wire = getWireById(id);
         wire.ifPresent(w -> {
             w.remove();
-            wires.remove(id);
+        });
+    }
+
+    public void spawnGate(String type, int ins, double x, double y) {
+        GateFactory.fromString(type, ins).ifPresent(m -> {
+            GraphicalComponent gc = new GraphicalComponent(componentId(), this, m);
+            if (GraphicsFactory.giveFromString(gc, type)) {
+                components.put(gc.getId(),gc);
+                gc.xProperty().set(x);
+                gc.yProperty().set(y);
+                getChildren().add(gc.getGraphics());
+                gc.setTypeString(type);
+            }
         });
     }
 

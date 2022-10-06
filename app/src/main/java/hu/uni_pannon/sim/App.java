@@ -62,6 +62,7 @@ public class App extends Application {
             data.toWorkspace().ifPresent(ws -> {
                 primaryStage.setScene(new Scene(ws.getPane()));
                 primaryStage.sizeToScene();
+                ws.spawnGate("XOR", 2, 100, 100);
                 primaryStage.setOnHidden(evt -> {
                     Serializer.writeToFile(ws.toData(), filename);
                 });

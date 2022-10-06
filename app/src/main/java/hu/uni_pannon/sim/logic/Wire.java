@@ -84,17 +84,17 @@ public class Wire extends Component {
 
     @Override
     public Optional<Boolean> getActualState(String output) {
-	return in.getActualState(inId);
+        return in.getActualState(inId);
     }
 
     @Override
     public void changeState() {
-	return;
+        return;
     }
 
     @Override
     public void genNextState() {
-	return;
+        return;
     }
 
 }

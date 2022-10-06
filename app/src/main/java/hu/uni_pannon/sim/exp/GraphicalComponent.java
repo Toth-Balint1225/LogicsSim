@@ -166,7 +166,12 @@ public class GraphicalComponent {
     }
 
     public void remove() {
-        parent.removeComponent(this);
+        for (String wire : wires) {
+            parent.removeWire(wire);
+        }
+        parent.getChildren().remove(graphics);
+        parent.getComponents().remove(id);
+        parent.getModel().remove(id);
     }
 
     public List<String> getWires() {

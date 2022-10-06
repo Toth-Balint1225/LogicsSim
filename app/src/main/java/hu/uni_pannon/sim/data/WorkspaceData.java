@@ -106,12 +106,14 @@ public class WorkspaceData {
                                 }
                                 gw.finishLine(p2.anchorX(), p2.anchorY(), gc2.getModel(), w.to.pin, w.to.component);
                                 ws.getWires().put(w.id,gw);
+                                ws.getModel().add(w.id,gw.getModel());
                             });
                         });
                     });
                 });
             }
         }
+        //ws.getModel().print();
         return Optional.of(ws);     
     }
 

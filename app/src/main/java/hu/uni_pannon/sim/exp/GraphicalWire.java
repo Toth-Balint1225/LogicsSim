@@ -427,5 +427,13 @@ public class GraphicalWire {
         }
 
         workspace.getWires().remove(id);
+        workspace.getModel().remove(id);
+
+        // model deletion
+        workspace.getComponentById(outComp).ifPresent(c1 -> {
+            c1.getPinById(outPin).ifPresent(p -> {
+                c1.getModel().removeInput(outPin);
+            });
+        });
     }
 }

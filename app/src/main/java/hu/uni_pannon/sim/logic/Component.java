@@ -135,6 +135,11 @@ public class Component {
         return this;
     }
 
+    public void removeInput(String id) {
+        if (ins.containsKey(id))
+            ins.remove(id);
+    }
+
     /**
      * Query for the lookup table.
      * @return the lookup table object
@@ -184,22 +189,22 @@ public class Component {
     }
 
     public void genNextState() {
-	// System.out.println("[STATE] generating next state");
-	List<String> activeIns = new LinkedList<>();
-	for (String it : ins.keySet()) {
-	    try {
-		if (ins.get(it).getActualState(it).get())
-		    activeIns.add(it);
-	    } catch (NullPointerException ex) {
-		ex.printStackTrace();
-	    }
+        // System.out.println("[STATE] generating next state");
+        List<String> activeIns = new LinkedList<>();
+        for (String it : ins.keySet()) {
+            try {
+            if (ins.get(it).getActualState(it).get())
+                activeIns.add(it);
+            } catch (NullPointerException ex) {
+            ex.printStackTrace();
+            }
 
-	}
+        }
 
-	for (String it : actualState.keySet()) {
-	    Optional<Boolean> res = lut.evaluate(activeIns,it);
-	    if (res.isPresent())
-		nextState.put(it,res.get());
-	}
+        for (String it : actualState.keySet()) {
+            Optional<Boolean> res = lut.evaluate(activeIns,it);
+            if (res.isPresent())
+            nextState.put(it,res.get());
+        }
     }
 }
