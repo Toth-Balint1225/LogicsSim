@@ -192,19 +192,16 @@ public class Component {
         // System.out.println("[STATE] generating next state");
         List<String> activeIns = new LinkedList<>();
         for (String it : ins.keySet()) {
-            try {
-            if (ins.get(it).getActualState(it).get())
-                activeIns.add(it);
-            } catch (NullPointerException ex) {
-            ex.printStackTrace();
-            }
-
+            ins.get(it).getActualState(it).ifPresent(state -> {
+                if (state)
+                    activeIns.add(it);
+            });
         }
 
         for (String it : actualState.keySet()) {
             Optional<Boolean> res = lut.evaluate(activeIns,it);
             if (res.isPresent())
-            nextState.put(it,res.get());
+                nextState.put(it,res.get());
         }
     }
 }

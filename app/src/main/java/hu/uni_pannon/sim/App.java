@@ -1,16 +1,13 @@
 package hu.uni_pannon.sim;
 
 import hu.uni_pannon.sim.gui.MainView;
-import hu.uni_pannon.sim.data.JsonParser;
 import hu.uni_pannon.sim.data.Serializer;
-import hu.uni_pannon.sim.data.WorkspaceData;
 import hu.uni_pannon.sim.exp.Workspace;
 import hu.uni_pannon.sim.exp.Controller;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
 public class App extends Application {
@@ -77,10 +74,11 @@ public class App extends Application {
         primaryStage.setScene(new Scene(root));
         primaryStage.sizeToScene();
         //primaryStage.setMaximized(true);
-
         Controller controller = (Controller)loader.getController();
         primaryStage.setOnHidden(evt -> {
             controller.stopRefreshThread();
+            final String filename = "C:/users/tothb/Documents/UNIV/Szakdolgozat/LogicsSimulator/tests.json";
+            Serializer.writeToFile(controller.getWorkspace().toData(), filename);
         });
 
         primaryStage.show();

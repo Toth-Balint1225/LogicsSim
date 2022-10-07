@@ -4,8 +4,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
-import javax.security.auth.x500.X500Principal;
-
 import hu.uni_pannon.sim.data.WorkspaceData;
 import hu.uni_pannon.sim.logic.Component;
 import hu.uni_pannon.sim.logic.Wire;

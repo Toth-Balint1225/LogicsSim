@@ -61,7 +61,7 @@ public class Controller {
 
     @FXML
     public void onStopButtonClicked(Event e) {
-        startRefreshThread();
+        stopRefreshThread();
     }
 
     private void evaluate() {
@@ -99,5 +99,9 @@ public class Controller {
 
     private synchronized boolean isRefreshThreadActive() {
         return refreshThreadActive;
+    }
+
+    public Workspace getWorkspace() {
+        return workspace;
     }
 }

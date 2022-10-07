@@ -1,16 +1,22 @@
 package hu.uni_pannon.sim.exp;
 
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
+import javafx.scene.shape.Circle;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
+import java.util.function.Predicate;
 
 import hu.uni_pannon.sim.data.WorkspaceData;
 import hu.uni_pannon.sim.logic.Component;
+import hu.uni_pannon.sim.logic.Input;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 
@@ -100,12 +106,13 @@ public class GraphicalComponent {
                 // drag start
                 prevX = evt.getX();
                 prevY = evt.getY();
-                dragging = true;
                 parent.setComponentMoving(true);
+
             }
         });
         // drag continue
         graphics.addEventHandler(MouseEvent.MOUSE_DRAGGED, evt -> {
+            dragging = true;
             double dx = evt.getX() - prevX;
             double dy = evt.getY() - prevY;
 
@@ -119,6 +126,10 @@ public class GraphicalComponent {
             if (dragging) {
                 dragging = false;
                 parent.setComponentMoving(false);
+            } else {
+                // if this is an input, we can turn it on 
+                if (!parent.isDrawingWire())
+                    toggle();
             }
         });
     }
@@ -176,6 +187,45 @@ public class GraphicalComponent {
 
     public List<String> getWires() {
         return wires;
+    }
+
+    private void toggle() {
+        if (typeString.equals("INPUT")) {
+            model.getActualState("out").ifPresent(state -> {
+                Paint col;
+                if (state.booleanValue()) {
+                    col = Color.WHITE;
+                    ((Input)model).low();
+                } else  {
+                    col = Color.BLUE;
+                    ((Input)model).high();
+                }
+                graphics.getChildren().filtered(node -> node instanceof Circle)
+                    .stream()
+                    .map(c -> (Circle)c)
+                    .forEach(c -> {
+                        c.setFill(col);
+                    });
+            });
+        }
+    }
+
+    public void update() {
+        if (typeString.equals("OUTPUT")) {
+            model.getActualState("out").ifPresent(state -> {
+                Paint col;
+                if (state.booleanValue())
+                    col = Color.BLUE;
+                else 
+                    col = Color.WHITE;
+                graphics.getChildren().filtered(node -> node instanceof Circle)
+                    .stream()
+                    .map(c -> (Circle)c)
+                    .forEach(c -> {
+                        c.setFill(col);
+                    });
+            });
+        }
     }
 
 }

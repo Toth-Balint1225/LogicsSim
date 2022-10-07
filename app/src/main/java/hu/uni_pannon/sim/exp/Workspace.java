@@ -156,6 +156,10 @@ public final class Workspace extends Group {
         return wires;
     }
 
+    public boolean isDrawingWire() {
+        return drawingWire;
+    }
+
     public Map<String,GraphicalComponent> getComponents() {
         return components;
     }
@@ -267,12 +271,16 @@ public final class Workspace extends Group {
                 gc.yProperty().set(y);
                 getChildren().add(gc.getGraphics());
                 gc.setTypeString(type);
+                getModel().add(gc.getId(),gc.getModel());
             }
         });
     }
 
     public void update() {
         for (Map.Entry<String,GraphicalWire> it : wires.entrySet()) {
+            it.getValue().update();
+        }
+        for (Map.Entry<String,GraphicalComponent> it : components.entrySet()) {
             it.getValue().update();
         }
     }

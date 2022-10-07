@@ -5,7 +5,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import hu.uni_pannon.sim.data.WorkspaceData;
-import hu.uni_pannon.sim.gui.GraphicalObject;
 import hu.uni_pannon.sim.logic.LookupTable;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
@@ -542,7 +541,7 @@ public class GraphicsFactory {
         res.getChildren().addAll(l1,l2);
 
         // add the one pin to rule them all
-        String pinId = c.getModel().getLUT().outputs().get(0);
+        String pinId = c.getModel().getLUT().inputs().get(0);
         Pin p = new Pin(pinId,c,Direction.LEFT);
         p.xProperty().bind(c.xProperty().add(0));
         p.yProperty().bind(c.yProperty().add(c.getSize() / 2));
