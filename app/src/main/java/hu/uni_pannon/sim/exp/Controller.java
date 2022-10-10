@@ -1,6 +1,9 @@
 package hu.uni_pannon.sim.exp;
 
 import hu.uni_pannon.sim.data.Serializer;
+import hu.uni_pannon.sim.data.WorkspaceData;
+import hu.uni_pannon.sim.logic.IntegratedComponent;
+import javafx.beans.value.WritableMapValue;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -25,11 +28,43 @@ public class Controller {
     private Thread refreshThread;
     private volatile boolean refreshThreadActive = false;
 
+    private IntegratedComponent ic;
     @FXML
     public void initialize() {
-        final String filename = "C:/users/tothb/Documents/UNIV/Szakdolgozat/LogicsSimulator/tests.json";
-        Serializer.readFromFile(filename).ifPresent(data -> {
+        final String draft = "C:/users/tothb/Documents/UNIV/Szakdolgozat/LogicsSimulator/draft.json";
+        final String test = "C:/users/tothb/Documents/UNIV/Szakdolgozat/LogicsSimulator/tests.json";
+        Serializer.readFromFile(draft).ifPresent(data -> {
             data.toWorkspace().ifPresent(ws -> {
+                // set up the drafts
+                ic = new IntegratedComponent(ws.getModel());
+            });
+        });
+        Serializer.readFromFile(test).ifPresent(data -> {
+            data.toWorkspace().ifPresent(ws -> {
+                GraphicalComponent c = new GraphicalComponent("draft",ws, ic);
+                WorkspaceData.Pin[] pinLayout = new WorkspaceData.Pin[4];
+                WorkspaceData.Pin p1 = new WorkspaceData.Pin();
+                p1.direction = "LEFT";
+                p1.id = "component17";
+                pinLayout[0] = p1;
+                WorkspaceData.Pin p2 = new WorkspaceData.Pin();
+                p2.direction = "LEFT";
+                p2.id = "component13";
+                pinLayout[1] = p2;
+                WorkspaceData.Pin p3 = new WorkspaceData.Pin();
+                p3.direction = "RIGHT";
+                p3.id = "component4";
+                pinLayout[2] = p3;
+                WorkspaceData.Pin p4 = new WorkspaceData.Pin();
+                p4.direction = "RIGHT";
+                p4.id = "component0";
+                pinLayout[3] = p4;
+                c.setName("DRAFT");
+                c.xProperty().set(200);
+                c.yProperty().set(200);
+                c.setTypeString("CUSTOM-IC");
+                GraphicsFactory.giveCustom(c, pinLayout, ic.getLUT());
+                ws.addComponent(c);
                 workspace = ws;
                 workPlacePane.getChildren().add(workspace.getPane());
             });

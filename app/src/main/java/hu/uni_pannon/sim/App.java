@@ -54,7 +54,7 @@ public class App extends Application {
     }
 
     public void start5(Stage primaryStage) throws Exception {
-        final String filename = "C:/users/tothb/Documents/UNIV/Szakdolgozat/LogicsSimulator/tests.json";
+        final String filename = "C:/users/tothb/Documents/UNIV/Szakdolgozat/LogicsSimulator/draft.json";
         Serializer.readFromFile(filename).ifPresent(data -> {
             data.toWorkspace().ifPresent(ws -> {
                 primaryStage.setScene(new Scene(ws.getPane()));
@@ -77,8 +77,8 @@ public class App extends Application {
         Controller controller = (Controller)loader.getController();
         primaryStage.setOnHidden(evt -> {
             controller.stopRefreshThread();
-            final String filename = "C:/users/tothb/Documents/UNIV/Szakdolgozat/LogicsSimulator/tests.json";
-            Serializer.writeToFile(controller.getWorkspace().toData(), filename);
+            final String filename = "C:/users/tothb/Documents/UNIV/Szakdolgozat/LogicsSimulator/draft.json";
+            // Serializer.writeToFile(controller.getWorkspace().toData(), filename);
         });
 
         primaryStage.show();

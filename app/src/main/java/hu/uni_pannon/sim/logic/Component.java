@@ -171,21 +171,21 @@ public class Component {
      * State transition
      */
     public void changeState() {
-	// deep copy the elements from next to actual state
-	for (Map.Entry<String,Boolean> it : nextState.entrySet())
-	    actualState.put(it.getKey(),it.getValue());
+        // deep copy the elements from next to actual state
+        for (Map.Entry<String,Boolean> it : nextState.entrySet())
+            actualState.put(it.getKey(),it.getValue());
     }
 
-    // this is just a getter now
+        // this is just a getter now
     public Optional<Boolean> getActualState(String output) {
-	// System.out.println("[EVAL] getting value of " + output);
-	boolean res = false;
-	try {
-	    res = actualState.get(output);
-	} catch (NullPointerException ex) {
-	    return Optional.empty();
-	}
-	return Optional.of(res);
+        // System.out.println("[EVAL] getting value of " + output);
+        boolean res = false;
+        try {
+            res = actualState.get(output);
+        } catch (NullPointerException ex) {
+            return Optional.empty();
+        }
+        return Optional.of(res);
     }
 
     public void genNextState() {

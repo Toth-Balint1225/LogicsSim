@@ -80,4 +80,8 @@ public class Circuit {
             System.out.println("[circuit] " + it.getKey());
         }
     }
+
+    public Map<String,Component> getComponents() {
+        return components;
+    } 
 }

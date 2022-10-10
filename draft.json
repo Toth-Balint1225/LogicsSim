@@ -1,0 +1,206 @@
+{
+    "name": "myWorkspace",
+    "height": 480.0,
+    "width": 640.0,
+    "types": [],
+    "components": [
+        {
+            "id": "component0",
+            "inputs": 1.0,
+            "position": {
+                "x": 463.0,
+                "y": 118.00000000000017
+            },
+            "type": "OUTPUT"
+        },
+        {
+            "id": "component13",
+            "inputs": 1.0,
+            "position": {
+                "x": 50.0,
+                "y": 304.0
+            },
+            "type": "INPUT"
+        },
+        {
+            "id": "component17",
+            "inputs": 1.0,
+            "position": {
+                "x": 62.0,
+                "y": 82.0
+            },
+            "type": "INPUT"
+        },
+        {
+            "id": "component2",
+            "inputs": 2.0,
+            "position": {
+                "x": 262.0,
+                "y": 260.0
+            },
+            "type": "NOR"
+        },
+        {
+            "id": "component3",
+            "inputs": 2.0,
+            "position": {
+                "x": 260.0,
+                "y": 118.0
+            },
+            "type": "NOR"
+        },
+        {
+            "id": "component4",
+            "inputs": 1.0,
+            "position": {
+                "x": 467.0,
+                "y": 259.0
+            },
+            "type": "OUTPUT"
+        }
+    ],
+    "wires": [
+        {
+            "id": "wire0",
+            "segments": [
+                {
+                    "x": 354.0,
+                    "y": 143.0
+                },
+                {
+                    "x": 354.0,
+                    "y": 185.0
+                },
+                {
+                    "x": 242.0,
+                    "y": 185.0
+                },
+                {
+                    "x": 242.0,
+                    "y": 276.6666666666667
+                }
+            ],
+            "from": {
+                "component": "component3",
+                "pin": "nor"
+            },
+            "to": {
+                "component": "component2",
+                "pin": "x0"
+            }
+        },
+        {
+            "id": "wire1",
+            "segments": [
+                {
+                    "x": 350.0,
+                    "y": 285.0
+                },
+                {
+                    "x": 350.0,
+                    "y": 238.0
+                },
+                {
+                    "x": 204.0,
+                    "y": 238.0
+                },
+                {
+                    "x": 204.0,
+                    "y": 151.33333333333334
+                }
+            ],
+            "from": {
+                "component": "component2",
+                "pin": "nor"
+            },
+            "to": {
+                "component": "component3",
+                "pin": "x1"
+            }
+        },
+        {
+            "id": "wire2",
+            "segments": [
+                {
+                    "x": 180.5,
+                    "y": 107.0
+                },
+                {
+                    "x": 180.5,
+                    "y": 134.66666666666666
+                }
+            ],
+            "from": {
+                "component": "component17",
+                "pin": "out"
+            },
+            "to": {
+                "component": "component3",
+                "pin": "x0"
+            }
+        },
+        {
+            "id": "wire3",
+            "segments": [
+                {
+                    "x": 201.5,
+                    "y": 329.0
+                },
+                {
+                    "x": 201.5,
+                    "y": 293.3333333333333
+                }
+            ],
+            "from": {
+                "component": "component13",
+                "pin": "out"
+            },
+            "to": {
+                "component": "component2",
+                "pin": "x1"
+            }
+        },
+        {
+            "id": "wire4",
+            "segments": [
+                {
+                    "x": 380.5,
+                    "y": 143.0
+                },
+                {
+                    "x": 380.5,
+                    "y": 143.00000000000017
+                }
+            ],
+            "from": {
+                "component": "component3",
+                "pin": "nor"
+            },
+            "to": {
+                "component": "component0",
+                "pin": "in"
+            }
+        },
+        {
+            "id": "wire5",
+            "segments": [
+                {
+                    "x": 390.5,
+                    "y": 285.0
+                },
+                {
+                    "x": 390.5,
+                    "y": 284.0
+                }
+            ],
+            "from": {
+                "component": "component2",
+                "pin": "nor"
+            },
+            "to": {
+                "component": "component4",
+                "pin": "in"
+            }
+        }
+    ]
+}
