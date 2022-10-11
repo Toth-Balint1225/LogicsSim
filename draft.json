@@ -1,11 +1,11 @@
 {
-    "name": "myWorkspace",
+    "name": "SR",
     "height": 480.0,
     "width": 640.0,
     "types": [],
     "components": [
         {
-            "id": "component0",
+            "id": "Q",
             "inputs": 1.0,
             "position": {
                 "x": 463.0,
@@ -14,7 +14,7 @@
             "type": "OUTPUT"
         },
         {
-            "id": "component13",
+            "id": "S",
             "inputs": 1.0,
             "position": {
                 "x": 50.0,
@@ -23,7 +23,7 @@
             "type": "INPUT"
         },
         {
-            "id": "component17",
+            "id": "R",
             "inputs": 1.0,
             "position": {
                 "x": 62.0,
@@ -50,7 +50,7 @@
             "type": "NOR"
         },
         {
-            "id": "component4",
+            "id": "-Q",
             "inputs": 1.0,
             "position": {
                 "x": 467.0,
@@ -131,7 +131,7 @@
                 }
             ],
             "from": {
-                "component": "component17",
+                "component": "R",
                 "pin": "out"
             },
             "to": {
@@ -152,7 +152,7 @@
                 }
             ],
             "from": {
-                "component": "component13",
+                "component": "S",
                 "pin": "out"
             },
             "to": {
@@ -177,7 +177,7 @@
                 "pin": "nor"
             },
             "to": {
-                "component": "component0",
+                "component": "Q",
                 "pin": "in"
             }
         },
@@ -198,7 +198,7 @@
                 "pin": "nor"
             },
             "to": {
-                "component": "component4",
+                "component": "-Q",
                 "pin": "in"
             }
         }
