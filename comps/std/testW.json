@@ -1,5 +1,6 @@
 {
-    "uid": "tmp:draft",
+    "uid": "std:testW",
+    "name": "DRAFT",
     "height": 480,
     "width": 640,
     "components": [
@@ -33,7 +34,7 @@
         {
             "id": "component3",
             "type": "AND",
-            "inputs": 0.0,
+            "inputs": 2.0,
             "position": {
                 "x": 265.0,
                 "y": 133.0
@@ -108,16 +109,19 @@
     "pins": [
         {
             "id": "component0",
+            "direction": "LEFT",
             "name": "A", 
             "input": true
         },
         {
             "id": "component1",
+            "direction": "LEFT",
             "name": "B", 
             "input": true
         },
         {
             "id": "component2",
+            "direction": "RIGHT",
             "name": "Q", 
             "input": false
         }

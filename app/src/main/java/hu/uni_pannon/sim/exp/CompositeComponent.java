@@ -9,7 +9,7 @@ public class CompositeComponent extends GraphicalComponent {
     public List<GraphicalComponent> components;
 
     public CompositeComponent(double x, double y, String id, Workspace parent) {
-        super(id,parent,null);
+        super(id,null);
         components = new LinkedList<>();
     }
 

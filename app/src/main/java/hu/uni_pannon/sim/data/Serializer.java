@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.Optional;
 
 public class Serializer {
-    public static Optional<WorkspaceData> readFromFile(String filename) {
+    private static Optional<String> readSource(String filename) {
         File f = new File(filename);
         BufferedReader reader = null;
         StringBuilder stb = new StringBuilder();
@@ -29,15 +29,15 @@ public class Serializer {
                 e.printStackTrace();
             }
         }
-        return Optional.of(JsonParser.getInstance().toClass(stb.toString(), WorkspaceData.class));
+        return Optional.of(stb.toString());
     }
 
-    public static void writeToFile(WorkspaceData data, String filename) {
+    private static void writeSource(String src, String filename) {
         File f = new File(filename);
         BufferedWriter writer = null;
         try {
             writer = new BufferedWriter(new FileWriter(f));
-            writer.write(JsonParser.getInstance().toJson(data));
+            writer.write(src);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -48,5 +48,25 @@ public class Serializer {
                 e.printStackTrace();
             }
         }
+    }
+
+    public static Optional<WorkspaceData> readWorkspaceFromFile(String filename) {
+        return readSource(filename).flatMap(src -> {
+            return Optional.of(JsonParser.getInstance().toClass(src, WorkspaceData.class));
+        });
+    }
+
+    public static void writeWorkspaceToFile(WorkspaceData data, String filename) {
+        writeSource(JsonParser.getInstance().toJson(data), filename);
+    }
+
+    public static Optional<TypeData> readTypeFromFile(String filename) {
+        return readSource(filename).flatMap(src -> {
+            return Optional.of(JsonParser.getInstance().toClass(src, TypeData.class));
+        });
+    }
+
+    public static void writeTypeToFile(WorkspaceData data, String filename) {
+        writeSource(JsonParser.getInstance().toJson(data), filename);
     }
 }

@@ -28,48 +28,24 @@ public class Controller {
     private Thread refreshThread;
     private volatile boolean refreshThreadActive = false;
 
-    private IntegratedComponent ic;
     @FXML
     public void initialize() {
-        final String draft = "C:/users/tothb/Documents/UNIV/Szakdolgozat/LogicsSimulator/draft.json";
         final String test = "C:/users/tothb/Documents/UNIV/Szakdolgozat/LogicsSimulator/tests.json";
-        Serializer.readFromFile(draft).ifPresent(data -> {
+        Serializer.readWorkspaceFromFile(test).ifPresent(data -> {
             data.toWorkspace().ifPresent(ws -> {
-                // set up the drafts
-                ic = new IntegratedComponent(ws.getModel());
-            });
-        });
-        Serializer.readFromFile(test).ifPresent(data -> {
-            data.toWorkspace().ifPresent(ws -> {
-                GraphicalComponent c = new GraphicalComponent("draft",ws, ic);
-                WorkspaceData.Pin[] pinLayout = new WorkspaceData.Pin[4];
-                WorkspaceData.Pin p1 = new WorkspaceData.Pin();
-                p1.direction = "LEFT";
-                p1.id = "R";
-                pinLayout[0] = p1;
-                WorkspaceData.Pin p2 = new WorkspaceData.Pin();
-                p2.direction = "LEFT";
-                p2.id = "S";
-                pinLayout[1] = p2;
-                WorkspaceData.Pin p3 = new WorkspaceData.Pin();
-                p3.direction = "RIGHT";
-                p3.id = "-Q";
-                pinLayout[2] = p3;
-                WorkspaceData.Pin p4 = new WorkspaceData.Pin();
-                p4.direction = "RIGHT";
-                p4.id = "Q";
-                pinLayout[3] = p4;
-                c.setName("SR");
-                c.xProperty().set(200);
-                c.yProperty().set(200);
-                c.setTypeString("CUSTOM-IC");
-                GraphicsFactory.giveCustom(c, pinLayout, ic.getLUT());
-                ws.addComponent(c);
+                ws.spawnGate("INPUT", 0, 100, 100);
+                ws.spawnGate("INPUT", 0, 100, 150);
+                ws.spawnGate("OUTPUT", 0, 100, 200);
+                ws.spawnGate("OUTPUT", 0, 100, 350);
+                ws.spawnGate("NOT", 1, 100, 450);
+                ws.spawnGate("AND", 2, 100, 500);
+                ws.spawnGate("AND", 2, 100, 550);
                 workspace = ws;
                 workPlacePane.getChildren().add(workspace.getPane());
             });
         });
     }
+
 
     @FXML
     public void onInteractButtonClicked(Event e) {

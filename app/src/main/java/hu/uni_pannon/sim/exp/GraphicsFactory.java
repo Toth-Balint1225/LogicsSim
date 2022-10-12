@@ -5,7 +5,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import hu.uni_pannon.sim.data.WorkspaceData;
-import hu.uni_pannon.sim.logic.LookupTable;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
 import javafx.scene.Group;
@@ -306,136 +305,144 @@ public class GraphicsFactory {
         pinsOr(c, true);
     }
 
-    public static void giveCustom(GraphicalComponent c, WorkspaceData.Pin[] pins, LookupTable lut) {
+    public static boolean giveCustom(GraphicalComponent c) {
         // base
-        Group res = new Group();
-        Rectangle rect = new Rectangle();
-        rect.xProperty().bind(c.xProperty());
-        rect.yProperty().bind(c.yProperty());
-        rect.setFill(background);
-        rect.setStroke(foreground);
-        rect.setStrokeWidth(strokeWidth);
-        res.getChildren().add(rect);
+        c.getPinLocations().ifPresent(pins -> {
+            Group res = new Group();
+            Rectangle rect = new Rectangle();
+            rect.xProperty().bind(c.xProperty());
+            rect.yProperty().bind(c.yProperty());
+            rect.setFill(background);
+            rect.setStroke(foreground);
+            rect.setStrokeWidth(strokeWidth);
+            res.getChildren().add(rect);
 
-        // size
-        List<WorkspaceData.Pin> tops = new LinkedList<>();
-        List<WorkspaceData.Pin> bots = new LinkedList<>();
-        List<WorkspaceData.Pin> lefts = new LinkedList<>();
-        List<WorkspaceData.Pin> rights = new LinkedList<>();
+            // size
+            List<WorkspaceData.Pin> tops = new LinkedList<>();
+            List<WorkspaceData.Pin> bots = new LinkedList<>();
+            List<WorkspaceData.Pin> lefts = new LinkedList<>();
+            List<WorkspaceData.Pin> rights = new LinkedList<>();
 
-        for (WorkspaceData.Pin p : pins) {
-            switch (p.direction) {
-                case "LEFT":
-                    lefts.add(p);
-                    break;
-                case "RIGHT":
-                    rights.add(p);
-                    break;
-                case "TOP":
-                    tops.add(p);
-                    break;
-                case "BOTTOM":
-                    bots.add(p);
-                    break;
-                default:
-                    break;
+            for (WorkspaceData.Pin p : pins) {
+                if (p.direction == null) {
+                    if (p.input) 
+                        p.direction = "LEFT";
+                    else
+                        p.direction = "RIGHT";
+                }
+                switch (p.direction) {
+                    case "LEFT":
+                        lefts.add(p);
+                        break;
+                    case "RIGHT":
+                        rights.add(p);
+                        break;
+                    case "TOP":
+                        tops.add(p);
+                        break;
+                    case "BOTTOM":
+                        bots.add(p);
+                        break;
+                    default:
+                        break;
+                }
             }
-        }
 
-        int widthCount = Math.max(Math.max(tops.size(), bots.size()), 2);
-        int heightCount = Math.max(Math.max(lefts.size(), rights.size()), 2);
+            int widthCount = Math.max(Math.max(tops.size(), bots.size()), 2);
+            int heightCount = Math.max(Math.max(lefts.size(), rights.size()), 2);
 
-        rect.setHeight(heightCount * c.getSize());
-        rect.setWidth(widthCount * c.getSize());
+            rect.setHeight(heightCount * c.getSize());
+            rect.setWidth(widthCount * c.getSize());
 
-        if (!c.getName().isPresent()) {
-            System.out.println("Name not found " + c.getTypeString());
-            return;
-        }
-        Label nameLab = new Label(c.getName().get());
-        nameLab.align(HPos.CENTER, VPos.CENTER);
-        nameLab.position(c.xProperty().add((widthCount * c.getSize()) / 2), 
-                         c.yProperty().add((heightCount * c.getSize()) / 2));
-        nameLab.setFont("Arial",FontWeight.BOLD, 14);
-        res.getChildren().add(nameLab.getNode());
-        c.setGraphics(res);
+            if (!c.getName().isPresent()) {
+                System.out.println("Name not found " + c.getTypeString());
+                return;
+            }
+            Label nameLab = new Label(c.getName().get());
+            nameLab.align(HPos.CENTER, VPos.CENTER);
+            nameLab.position(c.xProperty().add((widthCount * c.getSize()) / 2), 
+                            c.yProperty().add((heightCount * c.getSize()) / 2));
+            nameLab.setFont("Arial",FontWeight.BOLD, 14);
+            res.getChildren().add(nameLab.getNode());
+            c.setGraphics(res);
 
-        double i = 1;
-        // pin labels
-        for (WorkspaceData.Pin p : tops) {
-            Label l = new Label(p.id);
-            l.align(HPos.CENTER,VPos.TOP);
-            double offsetX = i / (tops.size() + 1) * (c.getSize() * widthCount);
-            l.position(c.xProperty().add(offsetX),c.yProperty().multiply(1));
-            l.setFont("Arial",FontWeight.BOLD, 12);
-            res.getChildren().add(l.getNode());
+            double i = 1;
+            // pin labels
+            for (WorkspaceData.Pin p : tops) {
+                Label l = new Label(p.name);
+                l.align(HPos.CENTER,VPos.TOP);
+                double offsetX = i / (tops.size() + 1) * (c.getSize() * widthCount);
+                l.position(c.xProperty().add(offsetX),c.yProperty().multiply(1));
+                l.setFont("Arial",FontWeight.BOLD, 12);
+                res.getChildren().add(l.getNode());
 
-            Pin gp = new Pin(p.id,c,Direction.UP);
-            gp.xProperty().bind(c.xProperty().add(offsetX));
-            gp.yProperty().bind(c.yProperty());
-            gp.setInput(lut.isInput(p.id));
-            c.addPin(p.id, gp);
+                Pin gp = new Pin(p.id,c,Direction.UP);
+                gp.xProperty().bind(c.xProperty().add(offsetX));
+                gp.yProperty().bind(c.yProperty());
+                gp.setInput(p.input);
+                c.addPin(p.id, gp);
+                
+
+                i++;
+            }
+            i = 1;
+            for (WorkspaceData.Pin p : bots) {
+                Label l = new Label(p.name);
+                l.align(HPos.CENTER,VPos.BOTTOM);
+                double offsetX = i / (bots.size() + 1) * (c.getSize() * widthCount);
+                double offsetY = heightCount * c.getSize();
+                l.position(c.xProperty().add(offsetX),c.yProperty().add(offsetY));
+                l.setFont("Arial",FontWeight.BOLD, 12);
+                res.getChildren().add(l.getNode());
+
+                Pin gp = new Pin(p.id,c,Direction.DOWN);
+                gp.xProperty().bind(c.xProperty().add(offsetX));
+                gp.yProperty().bind(c.yProperty().add(offsetY));
+                gp.setInput(p.input);
+                c.addPin(p.id, gp);
+
+                i++;
+            }
             
+            i = 1;
+            for (WorkspaceData.Pin p : lefts) {
+                Label l = new Label(p.name);
+                l.align(HPos.LEFT,VPos.CENTER);
+                double offsetX = 0;
+                double offsetY = i / (lefts.size() + 1) * (c.getSize() * heightCount);
+                l.position(c.xProperty().add(3),c.yProperty().add(offsetY));
+                l.setFont("Arial",FontWeight.BOLD, 12);
+                res.getChildren().add(l.getNode());
 
-            i++;
-        }
-        i = 1;
-        for (WorkspaceData.Pin p : bots) {
-            Label l = new Label(p.id);
-            l.align(HPos.CENTER,VPos.BOTTOM);
-            double offsetX = i / (bots.size() + 1) * (c.getSize() * widthCount);
-            double offsetY = heightCount * c.getSize();
-            l.position(c.xProperty().add(offsetX),c.yProperty().add(offsetY));
-            l.setFont("Arial",FontWeight.BOLD, 12);
-            res.getChildren().add(l.getNode());
+                Pin gp = new Pin(p.id,c,Direction.LEFT);
+                gp.xProperty().bind(c.xProperty().add(offsetX));
+                gp.yProperty().bind(c.yProperty().add(offsetY));
+                gp.setInput(p.input);
+                c.addPin(p.id, gp);
 
-            Pin gp = new Pin(p.id,c,Direction.DOWN);
-            gp.xProperty().bind(c.xProperty().add(offsetX));
-            gp.yProperty().bind(c.yProperty().add(offsetY));
-            gp.setInput(lut.isInput(p.id));
-            c.addPin(p.id, gp);
+                i++;
+            }
 
-            i++;
-        }
-        
-        i = 1;
-        for (WorkspaceData.Pin p : lefts) {
-            Label l = new Label(p.id);
-            l.align(HPos.LEFT,VPos.CENTER);
-            double offsetX = 0;
-            double offsetY = i / (lefts.size() + 1) * (c.getSize() * heightCount);
-            l.position(c.xProperty().add(3),c.yProperty().add(offsetY));
-            l.setFont("Arial",FontWeight.BOLD, 12);
-            res.getChildren().add(l.getNode());
+            i = 1;
+            for (WorkspaceData.Pin p : rights) {
+                Label l = new Label(p.name);
+                l.align(HPos.RIGHT,VPos.CENTER);
+                double offsetX = widthCount * c.getSize();
+                double offsetY = i / (rights.size() + 1) * (c.getSize() * heightCount);
+                l.position(c.xProperty().add(offsetX - 3),c.yProperty().add(offsetY));
+                l.setFont("Arial",FontWeight.BOLD, 12);
+                res.getChildren().add(l.getNode());
 
-            Pin gp = new Pin(p.id,c,Direction.LEFT);
-            gp.xProperty().bind(c.xProperty().add(offsetX));
-            gp.yProperty().bind(c.yProperty().add(offsetY));
-            gp.setInput(lut.isInput(p.id));
-            c.addPin(p.id, gp);
-
-            i++;
-        }
-
-        i = 1;
-        for (WorkspaceData.Pin p : rights) {
-            Label l = new Label(p.id);
-            l.align(HPos.RIGHT,VPos.CENTER);
-            double offsetX = widthCount * c.getSize();
-            double offsetY = i / (rights.size() + 1) * (c.getSize() * heightCount);
-            l.position(c.xProperty().add(offsetX - 3),c.yProperty().add(offsetY));
-            l.setFont("Arial",FontWeight.BOLD, 12);
-            res.getChildren().add(l.getNode());
-
-            Pin gp = new Pin(p.id,c,Direction.RIGHT);
-            gp.xProperty().bind(c.xProperty().add(offsetX));
-            gp.yProperty().bind(c.yProperty().add(offsetY));
-            gp.setInput(lut.isInput(p.id));
-            c.addPin(p.id, gp);
-           
-            i++;
-        }
-
+                Pin gp = new Pin(p.id,c,Direction.RIGHT);
+                gp.xProperty().bind(c.xProperty().add(offsetX));
+                gp.yProperty().bind(c.yProperty().add(offsetY));
+                gp.setInput(p.input);
+                c.addPin(p.id, gp);
+            
+                i++;
+            }
+        });
+        return true;
     }
 
     public static void giveHighConstant(GraphicalComponent c) {
@@ -590,6 +597,10 @@ public class GraphicsFactory {
             case "LOW":
                 giveLowConstant(c);
                 break;
+            case "CUSTOM":
+                return giveCustom(c);
+            case "CIRCUIT":
+                return giveCustom(c);
             default:
                 return false;
         }

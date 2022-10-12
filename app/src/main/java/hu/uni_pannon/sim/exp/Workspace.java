@@ -264,14 +264,12 @@ public final class Workspace extends Group {
 
     public void spawnGate(String type, int ins, double x, double y) {
         GateFactory.fromString(type, ins).ifPresent(m -> {
-            GraphicalComponent gc = new GraphicalComponent(componentId(), this, m);
+            GraphicalComponent gc = new GraphicalComponent(componentId(),m);
             if (GraphicsFactory.giveFromString(gc, type)) {
-                components.put(gc.getId(),gc);
                 gc.xProperty().set(x);
                 gc.yProperty().set(y);
-                getChildren().add(gc.getGraphics());
                 gc.setTypeString(type);
-                getModel().add(gc.getId(),gc.getModel());
+                gc.addToWorkspace(this);
             }
         });
     }
@@ -285,47 +283,75 @@ public final class Workspace extends Group {
         }
     }
 
-    public WorkspaceData toData() {
+    public WorkspaceData toData(String uid) {
         WorkspaceData res = new WorkspaceData();
+        // graphical stuff
         res.name = this.name;
+        res.uid = uid;
         res.height = pane.getPrefHeight();
         res.width = pane.getPrefWidth();
-        List<WorkspaceData.Type> typeBuffer = new LinkedList<>();
         res.components = new WorkspaceData.Component[components.size()];
+        List<WorkspaceData.Pin> pinBuffer = new LinkedList<>();
         int i = 0;
+        int inIdx = 0;
+        int outIdx = 0;
+        // components
         for (Map.Entry<String,GraphicalComponent> it : components.entrySet()) {
             WorkspaceData.Component c = new WorkspaceData.Component();
+            // ids
             c.id = it.getValue().getId();
-            it.getValue().getName().ifPresent(name -> {
-                c.name = name;
+            it.getValue().getUid().ifPresent(u -> {
+                c.uid = u;
             });
             c.position = new WorkspaceData.Position();
             c.position.x = it.getValue().xProperty().get();
             c.position.y = it.getValue().yProperty().get(); 
             c.type = it.getValue().getTypeString();
-            if (c.type.equals("CUSTOM")) {
-                // if the type is already saved, do nothing
-                it.getValue().getPinLocations().ifPresent(pins -> {
-                    if (typeBuffer.stream()
-                            .filter(t -> t.name.equals(c.name))
-                            .mapToInt(x -> 1)
-                            .reduce(0,Integer::sum) == 0) {
-                        WorkspaceData.Type type = new WorkspaceData.Type();
-                        type.name = c.name;
-                        type.pins = pins;
-                        type.lut = it.getValue().getModel().getLUT().toData();
-                        typeBuffer.add(type);
-                    }
-                });
-            } else {
-                // in this case we only need the inputs
+            res.components[i++] = c;
+
+            if (!(it.getValue().getTypeString().equals("CUSTOM") || it.getValue().getTypeString().equals("CIRCUIT"))) {
                 c.inputs = it.getValue().getModel().getLUT().inputs().size();
             }
-            res.types = typeBuffer.stream().toArray(WorkspaceData.Type[]::new);
-            res.components[i++] = c;
+
+            if (it.getValue().getTypeString().equals("INPUT")) {
+                WorkspaceData.Pin p = new WorkspaceData.Pin();
+                if (it.getValue().getDirection().isPresent()) {
+                    p.direction = it.getValue().getDirection().get();
+                } else {
+                    p.direction = "LEFT";
+                }
+                if (it.getValue().getName().isPresent()) {
+                    p.name = it.getValue().getName().get();
+                } else {
+                    p.name = String.format("X%d",inIdx++);
+                }
+                p.id = it.getKey();
+                p.input = true;
+                pinBuffer.add(p);
+            }
+
+            if (it.getValue().getTypeString().equals("OUTPUT")) {
+                WorkspaceData.Pin p = new WorkspaceData.Pin();
+                if (it.getValue().getDirection().isPresent()) {
+                    p.direction = it.getValue().getDirection().get();
+                } else {
+                    p.direction = "RIGHT";
+                }
+                if (it.getValue().getName().isPresent()) {
+                    p.name = it.getValue().getName().get();
+                } else {
+                    p.name = String.format("Q%d",outIdx++);
+                }
+                p.id = it.getKey();
+                p.input = false;
+                pinBuffer.add(p);
+            }
         }
+        // pin data about the inputs and outputs
+        res.pins = pinBuffer.stream().toArray(WorkspaceData.Pin[]::new);
 
         // wires
+        // NEVER touch the wires
         res.wires = new WorkspaceData.Wire[wires.size()];
         i = 0;
         for (Map.Entry<String,GraphicalWire> it : wires.entrySet()) {

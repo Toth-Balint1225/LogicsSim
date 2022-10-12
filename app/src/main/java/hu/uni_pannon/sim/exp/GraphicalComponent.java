@@ -1,7 +1,6 @@
 package hu.uni_pannon.sim.exp;
 
 import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -12,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
-import java.util.function.Predicate;
 
 import hu.uni_pannon.sim.data.WorkspaceData;
 import hu.uni_pannon.sim.logic.Component;
@@ -39,12 +37,15 @@ public class GraphicalComponent {
     private List<String> wires;
     private String typeString;
     private Optional<WorkspaceData.Pin[]> pinLocations;
+    private Optional<String> uid;
     private String name;
+    private Optional<String> direction;
 
-    public GraphicalComponent(String id, Workspace parent, Component model) {
+    public GraphicalComponent(String id, Component model) {
         this.id = id;
-        this.parent = parent;
         this.model = model;
+        this.uid = Optional.empty();
+        this.direction= Optional.empty();
         this.pinLocations = Optional.empty();
         this.wires = new LinkedList<>();
         xProperty = new SimpleDoubleProperty();
@@ -55,7 +56,23 @@ public class GraphicalComponent {
         pins = new TreeMap<>();
     }
 
-    public void setPinLocaions(WorkspaceData.Pin[] pins) {
+    public void setDirection(String dir) {
+        this.direction = Optional.of(dir);
+    }
+
+    public Optional<String> getDirection() {
+        return direction;
+    }
+
+    public void setUid(String uid) {
+        this.uid = Optional.of(uid);
+    }
+
+    public Optional<String> getUid() {
+        return uid;
+    }
+
+    public void setPinLocations(WorkspaceData.Pin[] pins) {
         this.pinLocations = Optional.of(pins);
     }
 
@@ -88,9 +105,12 @@ public class GraphicalComponent {
     public DoubleProperty yProperty() {
         return yProperty;
     }
-    
-    public void setGraphics(Group graphics) {
-        this.graphics = graphics;
+
+    public void addToWorkspace(Workspace ws) {
+
+        parent = ws;
+        parent.addComponent(this);
+
         graphics.addEventHandler(MouseEvent.MOUSE_ENTERED, evt -> {
             parent.componentActivity(ActivityType.ACT_ENTER, this.id);
         });
@@ -132,6 +152,10 @@ public class GraphicalComponent {
                     toggle();
             }
         });
+    }
+    
+    public void setGraphics(Group graphics) {
+        this.graphics = graphics;
     }
     
     public Group getGraphics() {

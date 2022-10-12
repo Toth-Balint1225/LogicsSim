@@ -47,20 +47,20 @@ public class App extends Application {
 
     //@Override
     public void start4(Stage primaryStage) throws Exception {
-        Serializer.readFromFile("C:/users/tothb/Documents/UNIV/Szakdolgozat/LogicsSimulator/workspace.json").ifPresent(data -> {
-            Serializer.writeToFile(data, "C:/users/tothb/Documents/UNIV/Szakdolgozat/LogicsSimulator/copy.json");
+        Serializer.readWorkspaceFromFile("C:/users/tothb/Documents/UNIV/Szakdolgozat/LogicsSimulator/workspace.json").ifPresent(data -> {
+            Serializer.writeWorkspaceToFile(data, "C:/users/tothb/Documents/UNIV/Szakdolgozat/LogicsSimulator/copy.json");
         });
         primaryStage.show();
     }
 
     public void start5(Stage primaryStage) throws Exception {
         final String filename = "C:/users/tothb/Documents/UNIV/Szakdolgozat/LogicsSimulator/draft.json";
-        Serializer.readFromFile(filename).ifPresent(data -> {
+        Serializer.readWorkspaceFromFile(filename).ifPresent(data -> {
             data.toWorkspace().ifPresent(ws -> {
                 primaryStage.setScene(new Scene(ws.getPane()));
                 primaryStage.sizeToScene();
                 primaryStage.setOnHidden(evt -> {
-                    Serializer.writeToFile(ws.toData(), filename);
+                    Serializer.writeWorkspaceToFile(ws.toData("std:tmp"), filename);
                 });
                 primaryStage.show();
             });
@@ -77,8 +77,8 @@ public class App extends Application {
         Controller controller = (Controller)loader.getController();
         primaryStage.setOnHidden(evt -> {
             controller.stopRefreshThread();
-            final String filename = "C:/users/tothb/Documents/UNIV/Szakdolgozat/LogicsSimulator/draft.json";
-            // Serializer.writeToFile(controller.getWorkspace().toData(), filename);
+            final String filename = "C:/users/tothb/Documents/UNIV/Szakdolgozat/LogicsSimulator/tests.json";
+            Serializer.writeWorkspaceToFile(controller.getWorkspace().toData("tmp:test"), filename);
         });
 
         primaryStage.show();
