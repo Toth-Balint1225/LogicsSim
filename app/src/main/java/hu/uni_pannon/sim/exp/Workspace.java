@@ -307,10 +307,10 @@ public final class Workspace extends Group {
             c.position.x = it.getValue().xProperty().get();
             c.position.y = it.getValue().yProperty().get(); 
             c.type = it.getValue().getTypeString();
-            res.components[i++] = c;
 
             if (!(it.getValue().getTypeString().equals("CUSTOM") || it.getValue().getTypeString().equals("CIRCUIT"))) {
                 c.inputs = it.getValue().getModel().getLUT().inputs().size();
+                c.high = it.getValue().getModel().getHighOuts();
             }
 
             if (it.getValue().getTypeString().equals("INPUT")) {
@@ -346,6 +346,7 @@ public final class Workspace extends Group {
                 p.input = false;
                 pinBuffer.add(p);
             }
+            res.components[i++] = c;
         }
         // pin data about the inputs and outputs
         res.pins = pinBuffer.stream().toArray(WorkspaceData.Pin[]::new);

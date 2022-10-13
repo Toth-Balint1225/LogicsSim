@@ -213,7 +213,7 @@ public class GraphicalComponent {
         return wires;
     }
 
-    private void toggle() {
+    public void toggle() {
         if (typeString.equals("INPUT")) {
             model.getActualState("out").ifPresent(state -> {
                 Paint col;

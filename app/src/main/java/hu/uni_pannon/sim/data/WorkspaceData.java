@@ -53,6 +53,7 @@ public class WorkspaceData {
         public String type; // CUSTOM, CIRCUIT or [GATES]
         public double inputs;      
         public Position position;  
+        public String[] high; // all the high outputs of a component, can be null for circuits
     }
 
     public static class Wire {
@@ -97,17 +98,29 @@ public class WorkspaceData {
                     gc.yProperty().set(c.position.y);
                     gc.setTypeString(c.type);
 
+                    // input specific settings
                     if (c.type.equals("INPUT")) {
+                        // workspace "pin"
                         getPinById(c.id).ifPresent(pin -> {
                             gc.setName(pin.name);
                             gc.setDirection(pin.direction);
                         });
+                        // if the output is high, then set it to high
+                        // if (c.high.length > 0) {
+                        //     gc.toggle();
+                        // }
                     }
+                    // output 
                     if (c.type.equals("OUTPUT")) {
                         getPinById(c.id).ifPresent(pin -> {
                             gc.setName(pin.name);
                             gc.setDirection(pin.direction);
                         });
+                    }
+                    // circuit specific
+                    if (!(c.type.equals("CIRCUIT") || c.high == null)) {
+                        for (String output : c.high)
+                            gc.getModel().setActualState(output, true);
                     }
                     gc.addToWorkspace(ws);
                 }

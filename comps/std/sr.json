@@ -1,6 +1,6 @@
 {
-    "name": "SR",
     "uid": "std:sr",
+    "name": "SR",
     "height": 480.0,
     "width": 640.0,
     "components": [
@@ -11,7 +11,8 @@
             "position": {
                 "x": 37.0,
                 "y": 393.0
-            }
+            },
+            "high": []
         },
         {
             "id": "component1",
@@ -20,7 +21,8 @@
             "position": {
                 "x": 43.0,
                 "y": 152.0
-            }
+            },
+            "high": []
         },
         {
             "id": "component2",
@@ -29,7 +31,8 @@
             "position": {
                 "x": 435.0,
                 "y": 182.99999999999994
-            }
+            },
+            "high": []
         },
         {
             "id": "component3",
@@ -38,7 +41,8 @@
             "position": {
                 "x": 250.0,
                 "y": 197.0
-            }
+            },
+            "high": []
         },
         {
             "id": "component4",
@@ -47,7 +51,10 @@
             "position": {
                 "x": 248.0,
                 "y": 341.0
-            }
+            },
+            "high": [
+                "nor"
+            ]
         },
         {
             "id": "component5",
@@ -56,7 +63,10 @@
             "position": {
                 "x": 448.0,
                 "y": 376.0
-            }
+            },
+            "high": [
+                "out"
+            ]
         }
     ],
     "wires": [

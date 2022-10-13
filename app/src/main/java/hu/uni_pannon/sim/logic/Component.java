@@ -188,6 +188,20 @@ public class Component {
         return Optional.of(res);
     }
 
+    public void setActualState(String output, boolean value) {
+        if (actualState.containsKey(output)) {
+            actualState.put(output,value);
+        }
+    }
+
+    public String[] getHighOuts() {
+        return actualState.entrySet().stream()
+            .filter(entry -> entry.getValue().booleanValue()) 
+            .map(entry -> entry.getKey())
+            .toArray(String[]::new);
+
+    }
+
     public void genNextState() {
         // System.out.println("[STATE] generating next state");
         List<String> activeIns = new LinkedList<>();

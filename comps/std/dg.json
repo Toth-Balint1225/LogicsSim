@@ -1,0 +1,297 @@
+{
+    "uid": "std:dg",
+    "name": "DG",
+    "height": 480.0,
+    "width": 640.0,
+    "components": [
+        {
+            "id": "component0",
+            "uid": "std:sr",
+            "type": "CIRCUIT",
+            "inputs": 0.0,
+            "position": {
+                "x": 346.0,
+                "y": 158.0
+            }
+        },
+        {
+            "id": "component1",
+            "type": "INPUT",
+            "inputs": 1.0,
+            "position": {
+                "x": 25.0,
+                "y": 163.0
+            },
+            "high": []
+        },
+        {
+            "id": "component2",
+            "type": "INPUT",
+            "inputs": 1.0,
+            "position": {
+                "x": 29.0,
+                "y": 245.0
+            },
+            "high": []
+        },
+        {
+            "id": "component3",
+            "type": "OUTPUT",
+            "inputs": 1.0,
+            "position": {
+                "x": 485.0,
+                "y": 101.0
+            },
+            "high": []
+        },
+        {
+            "id": "component4",
+            "type": "OUTPUT",
+            "inputs": 1.0,
+            "position": {
+                "x": 479.0,
+                "y": 239.0
+            },
+            "high": [
+                "out"
+            ]
+        },
+        {
+            "id": "component5",
+            "type": "NOT",
+            "inputs": 1.0,
+            "position": {
+                "x": 132.0,
+                "y": 124.0
+            },
+            "high": [
+                "not"
+            ]
+        },
+        {
+            "id": "component6",
+            "type": "AND",
+            "inputs": 2.0,
+            "position": {
+                "x": 251.0,
+                "y": 215.0
+            },
+            "high": []
+        },
+        {
+            "id": "component7",
+            "type": "AND",
+            "inputs": 2.0,
+            "position": {
+                "x": 253.0,
+                "y": 141.0
+            },
+            "high": []
+        }
+    ],
+    "wires": [
+        {
+            "id": "wire0",
+            "segments": [
+                {
+                    "x": 456.0,
+                    "y": 126.0
+                }
+            ],
+            "from": {
+                "component": "component0",
+                "pin": "component2"
+            },
+            "to": {
+                "component": "component3",
+                "pin": "in"
+            }
+        },
+        {
+            "id": "wire1",
+            "segments": [
+                {
+                    "x": 456.0,
+                    "y": 264.0
+                }
+            ],
+            "from": {
+                "component": "component0",
+                "pin": "component5"
+            },
+            "to": {
+                "component": "component4",
+                "pin": "in"
+            }
+        },
+        {
+            "id": "wire2",
+            "segments": [
+                {
+                    "x": 323.0,
+                    "y": 240.0
+                },
+                {
+                    "x": 323.0,
+                    "y": 224.66666666666666
+                }
+            ],
+            "from": {
+                "component": "component6",
+                "pin": "and"
+            },
+            "to": {
+                "component": "component0",
+                "pin": "component1"
+            }
+        },
+        {
+            "id": "wire3",
+            "segments": [
+                {
+                    "x": 313.0,
+                    "y": 191.33333333333331
+                }
+            ],
+            "from": {
+                "component": "component7",
+                "pin": "and"
+            },
+            "to": {
+                "component": "component0",
+                "pin": "component0"
+            }
+        },
+        {
+            "id": "wire4",
+            "segments": [
+                {
+                    "x": 174.5,
+                    "y": 270.0
+                },
+                {
+                    "x": 174.5,
+                    "y": 248.33333333333334
+                }
+            ],
+            "from": {
+                "component": "component2",
+                "pin": "out"
+            },
+            "to": {
+                "component": "component6",
+                "pin": "x1"
+            }
+        },
+        {
+            "id": "wire5",
+            "segments": [
+                {
+                    "x": 217.0,
+                    "y": 149.0
+                },
+                {
+                    "x": 217.0,
+                    "y": 157.66666666666666
+                }
+            ],
+            "from": {
+                "component": "component5",
+                "pin": "not"
+            },
+            "to": {
+                "component": "component7",
+                "pin": "x0"
+            }
+        },
+        {
+            "id": "wire6",
+            "segments": [
+                {
+                    "x": 108.0,
+                    "y": 270.0
+                },
+                {
+                    "x": 108.0,
+                    "y": 149.0
+                }
+            ],
+            "from": {
+                "component": "component2",
+                "pin": "out"
+            },
+            "to": {
+                "component": "component5",
+                "pin": "x"
+            }
+        },
+        {
+            "id": "wire7",
+            "segments": [
+                {
+                    "x": 215.0,
+                    "y": 188.0
+                },
+                {
+                    "x": 215.0,
+                    "y": 174.33333333333334
+                }
+            ],
+            "from": {
+                "component": "component1",
+                "pin": "out"
+            },
+            "to": {
+                "component": "component7",
+                "pin": "x1"
+            }
+        },
+        {
+            "id": "wire8",
+            "segments": [
+                {
+                    "x": 215.0,
+                    "y": 188.0
+                },
+                {
+                    "x": 215.0,
+                    "y": 231.66666666666666
+                }
+            ],
+            "from": {
+                "component": "component1",
+                "pin": "out"
+            },
+            "to": {
+                "component": "component6",
+                "pin": "x0"
+            }
+        }
+    ],
+    "pins": [
+        {
+            "id": "component1",
+            "direction": "LEFT",
+            "input": true,
+            "name": "X0"
+        },
+        {
+            "id": "component2",
+            "direction": "LEFT",
+            "input": true,
+            "name": "X1"
+        },
+        {
+            "id": "component3",
+            "direction": "RIGHT",
+            "input": false,
+            "name": "Q0"
+        },
+        {
+            "id": "component4",
+            "direction": "RIGHT",
+            "input": false,
+            "name": "Q1"
+        }
+    ]
+}
