@@ -151,6 +151,7 @@ public class WorkspaceData {
             }
         }
         //ws.getModel().print();
+        ws.getPane().setPrefSize(width, height);
         return Optional.of(ws);     
     }
 
@@ -173,7 +174,7 @@ public class WorkspaceData {
             // load it as component
             return ComponentLoader.getInstance()
                 .locateWorkspace(c.uid).flatMap(wd -> {
-                    return wd.toComponent(c).flatMap(gc -> {
+                    return wd.toComponent(c.id).flatMap(gc -> {
                         gc.setPinLocations(wd.pins);
                         gc.setName(wd.name);
                         return Optional.of(gc);
@@ -189,12 +190,12 @@ public class WorkspaceData {
     }
 
     // will transform this into an integrated component
-    public Optional<GraphicalComponent> toComponent(Component c) {
+    public Optional<GraphicalComponent> toComponent(String _id) {
         // assemble the workspace
         Optional<Workspace> ws = toWorkspace();
         if (ws.isPresent() && uid != null) {
             IntegratedComponent ic = new IntegratedComponent(ws.get().getModel());
-            GraphicalComponent gc = new GraphicalComponent(c.id,ic);
+            GraphicalComponent gc = new GraphicalComponent(_id,ic);
             gc.setUid(uid);
             gc.setPinLocations(pins);
             gc.setName(name);

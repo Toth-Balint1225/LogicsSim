@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
 
+import hu.uni_pannon.sim.data.ComponentLoader;
 import hu.uni_pannon.sim.data.WorkspaceData;
 import hu.uni_pannon.sim.logic.Circuit;
 import hu.uni_pannon.sim.logic.gates.GateFactory;
@@ -272,6 +273,26 @@ public final class Workspace extends Group {
                 gc.addToWorkspace(this);
             }
         });
+    }
+
+    public void spawnIntegratedComponent(String uid, double x, double y) {
+        ComponentLoader.getInstance()
+                .locateWorkspace(uid).flatMap(wd -> {
+                    return wd.toComponent(componentId()).flatMap(gc -> {
+                        gc.setPinLocations(wd.pins);
+                        gc.setName(wd.name);
+                        return Optional.of(gc);
+                    });
+                }).ifPresent(gc -> {
+                    if (GraphicsFactory.giveFromString(gc, "CIRCUIT")) {
+                        gc.xProperty().set(x);
+                        gc.yProperty().set(y);
+                        gc.setTypeString("CIRCUIT");
+                        gc.setUid(uid);
+                        gc.addToWorkspace(this);
+                    }
+                });
+
     }
 
     public void update() {

@@ -75,10 +75,9 @@ public class App extends Application {
         primaryStage.sizeToScene();
         //primaryStage.setMaximized(true);
         Controller controller = (Controller)loader.getController();
+        controller.setStage(primaryStage);
         primaryStage.setOnHidden(evt -> {
             controller.stopRefreshThread();
-            final String filename = "C:/users/tothb/Documents/UNIV/Szakdolgozat/LogicsSimulator/tests.json";
-            Serializer.writeWorkspaceToFile(controller.getWorkspace().toData("tmp:test"), filename);
         });
 
         primaryStage.show();
