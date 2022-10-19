@@ -33,7 +33,9 @@ javafx {
 }
 application {
     // Define the main class for the application.
-    mainClass = 'hu.uni_pannon.sim.App'
+    mainClass = 'hu.unipannon.sim.App'
+    mainModule = 'hu.unipannon.sim'
+    
 }
 
 test {
