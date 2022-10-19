@@ -1,6 +1,9 @@
 package hu.uni_pannon.sim.logic;
 
 import java.util.TreeMap;
+
+import hu.uni_pannon.sim.data.WorkspaceData;
+
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -212,14 +215,14 @@ public class LookupTable {
                 return Optional.empty();
             }
 	    powers[idx] = inputIndexes.get(s);
-	    System.out.println("" + powers[idx]);
+	    //System.out.println("" + powers[idx]);
 	    idx++;
 	}
 
 	int row = Arrays.stream(powers)
 	    .reduce(0,(x,y) -> x + (int)Math.pow(2,y));
 
-	System.out.println("row: " + row);
+	//System.out.println("row: " + row);
 	return Optional.of(row);
 	
 	/*
@@ -265,5 +268,50 @@ public class LookupTable {
         out.putAll(outputIndexes);
         lut.setIndexes(in,out);
         return lut;
+    }
+
+    public WorkspaceData.LUT toData() {
+        WorkspaceData.LUT res = new WorkspaceData.LUT();
+        // inputs and outputs
+        res.inputs = inputIndexes.keySet().stream().toArray(String[]::new);
+        res.outputs= outputIndexes.keySet().stream().toArray(String[]::new);
+        List<WorkspaceData.LUTEntry> entryBuffer = new LinkedList<>();
+        // lut entries
+        for (int i=0;i<rows;i++) {
+            WorkspaceData.LUTEntry entry = new WorkspaceData.LUTEntry();
+            List<String> lhsBuffer = new LinkedList<>();
+            List<String> rhsBuffer = new LinkedList<>();
+            for (int j=0;j<inN;j++) {
+                final int jPrime = j;
+                if (inputTable[i][j]) {
+                    lhsBuffer.add(inputIndexes.entrySet().stream()
+                        .filter(e -> {
+                            return e.getValue().equals(jPrime);
+                        })
+                        .map(e -> e.getKey())
+                        .toArray(String[]::new)[0]);
+                }
+            }
+            boolean toAdd = false;
+            for (int j=0;j<outN;j++) {
+                if (outputTable[i][j]) {
+                    final int jPrime = j;
+                    rhsBuffer.add(outputIndexes.entrySet().stream()
+                        .filter(e -> {
+                            return e.getValue().equals(jPrime);
+                        })
+                        .map(e -> e.getKey())
+                        .toArray(String[]::new)[0]);
+                    toAdd = true;
+                }
+            }
+            if (toAdd) {
+                entryBuffer.add(entry);
+                entry.lhs = lhsBuffer.stream().toArray(String[]::new);
+                entry.rhs = rhsBuffer.stream().toArray(String[]::new);
+            }
+        }
+        res.entries = entryBuffer.stream().toArray(WorkspaceData.LUTEntry[]::new);
+        return res;
     }
 }

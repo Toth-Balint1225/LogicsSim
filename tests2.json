@@ -1,0 +1,129 @@
+{
+    "uid": "tmp:test",
+    "height": 480.0,
+    "width": 640.0,
+    "components": [
+        {
+            "id": "component0",
+            "uid": "std:testW",
+            "type": "CIRCUIT",
+            "inputs": 0.0,
+            "position": {
+                "x": 243.0,
+                "y": 139.0
+            }
+        },
+        {
+            "id": "component1",
+            "type": "INPUT",
+            "inputs": 0.0,
+            "position": {
+                "x": 49.0,
+                "y": 172.0
+            }
+        },
+        {
+            "id": "component2",
+            "type": "INPUT",
+            "inputs": 0.0,
+            "position": {
+                "x": 47.0,
+                "y": 274.0
+            }
+        },
+        {
+            "id": "component3",
+            "type": "OUTPUT",
+            "inputs": 0.0,
+            "position": {
+                "x": 417.0,
+                "y": 273.0
+            }
+        }
+    ],
+    "wires": [
+        {
+            "id": "wire0",
+            "segments": [
+                {
+                    "x": 146.0,
+                    "y": 197.0
+                },
+                {
+                    "x": 146.0,
+                    "y": 172.33333333333331
+                }
+            ],
+            "from": {
+                "component": "component1",
+                "pin": "out"
+            },
+            "to": {
+                "component": "component0",
+                "pin": "component0"
+            }
+        },
+        {
+            "id": "wire1",
+            "segments": [
+                {
+                    "x": 144.0,
+                    "y": 299.0
+                },
+                {
+                    "x": 144.0,
+                    "y": 205.66666666666666
+                }
+            ],
+            "from": {
+                "component": "component2",
+                "pin": "out"
+            },
+            "to": {
+                "component": "component0",
+                "pin": "component1"
+            }
+        },
+        {
+            "id": "wire2",
+            "segments": [
+                {
+                    "x": 354.0,
+                    "y": 189.0
+                },
+                {
+                    "x": 354.0,
+                    "y": 298.0
+                }
+            ],
+            "from": {
+                "component": "component0",
+                "pin": "component2"
+            },
+            "to": {
+                "component": "component3",
+                "pin": "in"
+            }
+        }
+    ],
+    "pins": [
+        {
+            "id": "component1",
+            "direction": "LEFT",
+            "input": true,
+            "name": "X0"
+        },
+        {
+            "id": "component2",
+            "direction": "LEFT",
+            "input": true,
+            "name": "X1"
+        },
+        {
+            "id": "component3",
+            "direction": "RIGHT",
+            "input": false,
+            "name": "Q0"
+        }
+    ]
+}

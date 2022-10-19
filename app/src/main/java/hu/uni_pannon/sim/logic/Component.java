@@ -135,6 +135,11 @@ public class Component {
         return this;
     }
 
+    public void removeInput(String id) {
+        if (ins.containsKey(id))
+            ins.remove(id);
+    }
+
     /**
      * Query for the lookup table.
      * @return the lookup table object
@@ -166,40 +171,51 @@ public class Component {
      * State transition
      */
     public void changeState() {
-	// deep copy the elements from next to actual state
-	for (Map.Entry<String,Boolean> it : nextState.entrySet())
-	    actualState.put(it.getKey(),it.getValue());
+        // deep copy the elements from next to actual state
+        for (Map.Entry<String,Boolean> it : nextState.entrySet())
+            actualState.put(it.getKey(),it.getValue());
     }
 
-    // this is just a getter now
-    public Optional<Boolean> getActualState(String output) {
-	// System.out.println("[EVAL] getting value of " + output);
-	boolean res = false;
-	try {
-	    res = actualState.get(output);
-	} catch (NullPointerException ex) {
-	    return Optional.empty();
-	}
-	return Optional.of(res);
+        // this is just a getter now
+    public synchronized Optional<Boolean> getActualState(String output) {
+        // System.out.println("[EVAL] getting value of " + output);
+        boolean res = false;
+        try {
+            res = actualState.get(output);
+        } catch (NullPointerException ex) {
+            return Optional.empty();
+        }
+        return Optional.of(res);
     }
 
-    public void genNextState() {
-	// System.out.println("[STATE] generating next state");
-	List<String> activeIns = new LinkedList<>();
-	for (String it : ins.keySet()) {
-	    try {
-		if (ins.get(it).getActualState(it).get())
-		    activeIns.add(it);
-	    } catch (NullPointerException ex) {
-		ex.printStackTrace();
-	    }
+    public void setActualState(String output, boolean value) {
+        if (actualState.containsKey(output)) {
+            actualState.put(output,value);
+        }
+    }
 
-	}
+    public String[] getHighOuts() {
+        return actualState.entrySet().stream()
+            .filter(entry -> entry.getValue().booleanValue()) 
+            .map(entry -> entry.getKey())
+            .toArray(String[]::new);
 
-	for (String it : actualState.keySet()) {
-	    Optional<Boolean> res = lut.evaluate(activeIns,it);
-	    if (res.isPresent())
-		nextState.put(it,res.get());
-	}
+    }
+
+    public synchronized void genNextState() {
+        // System.out.println("[STATE] generating next state");
+        List<String> activeIns = new LinkedList<>();
+        for (String it : ins.keySet()) {
+            ins.get(it).getActualState(it).ifPresent(state -> {
+                if (state)
+                    activeIns.add(it);
+            });
+        }
+
+        for (String it : actualState.keySet()) {
+            Optional<Boolean> res = lut.evaluate(activeIns,it);
+            if (res.isPresent())
+                nextState.put(it,res.get());
+        }
     }
 }

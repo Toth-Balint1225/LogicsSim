@@ -19,7 +19,7 @@ public class Circuit {
      * Default constructor.
      */
     public Circuit() {
-       components = new TreeMap<>(); 
+        components = new TreeMap<>(); 
     }
 
     /**
@@ -59,18 +59,29 @@ public class Circuit {
     /**
      * Evaluation of the whole circuit.
      */
-    public void evaluate() {
+    public synchronized void evaluate() {
 	// System.out.println("[CIRCUIT] eval started");
 	// evaluate all with the actual states 
         for (Map.Entry<String,Component> entry : components.entrySet()) {
-	    entry.getValue().genNextState();
-	}
+            entry.getValue().genNextState();
+        }
 
 	// System.out.println("[CIRCUIT] state change started");
 	// change the new satates to actual
         for (Map.Entry<String,Component> entry : components.entrySet()) {
-	    entry.getValue().changeState();
-	}
+            entry.getValue().changeState();
+        }
 	// System.out.println("[CIRCUIT] eval finished\n\n\n");
     }
+
+    public void print() {
+        System.out.println("Printing circuit");
+        for (Map.Entry<String,Component> it : components.entrySet()) {
+            System.out.println("[circuit] " + it.getKey());
+        }
+    }
+
+    public Map<String,Component> getComponents() {
+        return components;
+    } 
 }

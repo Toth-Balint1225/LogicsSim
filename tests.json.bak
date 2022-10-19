@@ -1,0 +1,393 @@
+{
+    "name": "myWorkspace",
+    "height": 480.0,
+    "width": 640.0,
+    "types": [
+        {
+            "name": "ADD",
+            "lut": {
+                "inputs": [
+                    "a",
+                    "b",
+                    "cin"
+                ],
+                "outputs": [
+                    "cout",
+                    "s"
+                ],
+                "entries": [
+                    {
+                        "rhs": [
+                            "s"
+                        ],
+                        "lhs": [
+                            "cin"
+                        ]
+                    },
+                    {
+                        "rhs": [
+                            "s"
+                        ],
+                        "lhs": [
+                            "b"
+                        ]
+                    },
+                    {
+                        "rhs": [
+                            "cout"
+                        ],
+                        "lhs": [
+                            "b",
+                            "cin"
+                        ]
+                    },
+                    {
+                        "rhs": [
+                            "s"
+                        ],
+                        "lhs": [
+                            "a"
+                        ]
+                    },
+                    {
+                        "rhs": [
+                            "cout"
+                        ],
+                        "lhs": [
+                            "a",
+                            "cin"
+                        ]
+                    },
+                    {
+                        "rhs": [
+                            "cout"
+                        ],
+                        "lhs": [
+                            "a",
+                            "b"
+                        ]
+                    },
+                    {
+                        "rhs": [
+                            "cout",
+                            "s"
+                        ],
+                        "lhs": [
+                            "a",
+                            "b",
+                            "cin"
+                        ]
+                    }
+                ]
+            },
+            "pins": [
+                {
+                    "id": "a",
+                    "direction": "LEFT"
+                },
+                {
+                    "id": "b",
+                    "direction": "LEFT"
+                },
+                {
+                    "id": "cin",
+                    "direction": "TOP"
+                },
+                {
+                    "id": "s",
+                    "direction": "RIGHT"
+                },
+                {
+                    "id": "cout",
+                    "direction": "BOTTOM"
+                }
+            ]
+        }
+    ],
+    "components": [
+        {
+            "id": "component0",
+            "inputs": 1.0,
+            "position": {
+                "x": 419.0,
+                "y": 102.00000000000017
+            },
+            "type": "OUTPUT"
+        },
+        {
+            "id": "component1",
+            "inputs": 2.0,
+            "position": {
+                "x": 336.0,
+                "y": 42.0
+            },
+            "type": "AND"
+        },
+        {
+            "id": "component13",
+            "inputs": 1.0,
+            "position": {
+                "x": 83.0,
+                "y": 163.0
+            },
+            "type": "INPUT"
+        },
+        {
+            "id": "component14",
+            "inputs": 1.0,
+            "position": {
+                "x": 8.0,
+                "y": 228.0
+            },
+            "type": "INPUT"
+        },
+        {
+            "id": "component15",
+            "inputs": 1.0,
+            "position": {
+                "x": 91.0,
+                "y": 377.0
+            },
+            "type": "INPUT"
+        },
+        {
+            "id": "component16",
+            "inputs": 1.0,
+            "position": {
+                "x": 18.0,
+                "y": 438.0
+            },
+            "type": "INPUT"
+        },
+        {
+            "id": "component17",
+            "inputs": 1.0,
+            "position": {
+                "x": 39.0,
+                "y": 21.0
+            },
+            "type": "INPUT"
+        },
+        {
+            "id": "component3",
+            "inputs": 1.0,
+            "position": {
+                "x": 406.0,
+                "y": 509.0
+            },
+            "type": "OUTPUT"
+        },
+        {
+            "id": "component4",
+            "inputs": 1.0,
+            "position": {
+                "x": 407.0,
+                "y": 297.9999999999998
+            },
+            "type": "OUTPUT"
+        },
+        {
+            "id": "component5",
+            "name": "ADD",
+            "inputs": 0.0,
+            "position": {
+                "x": 206.0,
+                "y": 130.0
+            },
+            "type": "CUSTOM"
+        },
+        {
+            "id": "component7",
+            "name": "ADD",
+            "inputs": 0.0,
+            "position": {
+                "x": 225.0,
+                "y": 334.0
+            },
+            "type": "CUSTOM"
+        }
+    ],
+    "wires": [
+        {
+            "id": "wire0",
+            "segments": [
+                {
+                    "x": 256.0,
+                    "y": 46.0
+                },
+                {
+                    "x": 256.0,
+                    "y": 120.0
+                }
+            ],
+            "from": {
+                "component": "component17",
+                "pin": "out"
+            },
+            "to": {
+                "component": "component5",
+                "pin": "cin"
+            }
+        },
+        {
+            "id": "wire1",
+            "segments": [
+                {
+                    "x": 164.0,
+                    "y": 188.0
+                },
+                {
+                    "x": 164.0,
+                    "y": 163.33333333333331
+                }
+            ],
+            "from": {
+                "component": "component13",
+                "pin": "out"
+            },
+            "to": {
+                "component": "component5",
+                "pin": "a"
+            }
+        },
+        {
+            "id": "wire2",
+            "segments": [
+                {
+                    "x": 175.0,
+                    "y": 253.0
+                },
+                {
+                    "x": 175.0,
+                    "y": 196.66666666666666
+                }
+            ],
+            "from": {
+                "component": "component14",
+                "pin": "out"
+            },
+            "to": {
+                "component": "component5",
+                "pin": "b"
+            }
+        },
+        {
+            "id": "wire3",
+            "segments": [
+                {
+                    "x": 173.0,
+                    "y": 402.0
+                },
+                {
+                    "x": 173.0,
+                    "y": 367.3333333333333
+                }
+            ],
+            "from": {
+                "component": "component15",
+                "pin": "out"
+            },
+            "to": {
+                "component": "component7",
+                "pin": "a"
+            }
+        },
+        {
+            "id": "wire4",
+            "segments": [
+                {
+                    "x": 187.0,
+                    "y": 463.0
+                },
+                {
+                    "x": 187.0,
+                    "y": 400.66666666666663
+                }
+            ],
+            "from": {
+                "component": "component16",
+                "pin": "out"
+            },
+            "to": {
+                "component": "component7",
+                "pin": "b"
+            }
+        },
+        {
+            "id": "wire5",
+            "segments": [
+                {
+                    "x": 375.5,
+                    "y": 180.0
+                },
+                {
+                    "x": 375.5,
+                    "y": 127.00000000000017
+                }
+            ],
+            "from": {
+                "component": "component5",
+                "pin": "s"
+            },
+            "to": {
+                "component": "component0",
+                "pin": "in"
+            }
+        },
+        {
+            "id": "wire6",
+            "segments": [
+                {
+                    "x": 275.0,
+                    "y": 534.0
+                }
+            ],
+            "from": {
+                "component": "component7",
+                "pin": "cout"
+            },
+            "to": {
+                "component": "component3",
+                "pin": "in"
+            }
+        },
+        {
+            "id": "wire7",
+            "segments": [
+                {
+                    "x": 371.0,
+                    "y": 384.0
+                },
+                {
+                    "x": 371.0,
+                    "y": 322.9999999999998
+                }
+            ],
+            "from": {
+                "component": "component7",
+                "pin": "s"
+            },
+            "to": {
+                "component": "component4",
+                "pin": "in"
+            }
+        },
+        {
+            "id": "wire8",
+            "segments": [
+                {
+                    "x": 256.0,
+                    "y": 324.0
+                }
+            ],
+            "from": {
+                "component": "component5",
+                "pin": "cout"
+            },
+            "to": {
+                "component": "component7",
+                "pin": "cin"
+            }
+        }
+    ]
+}

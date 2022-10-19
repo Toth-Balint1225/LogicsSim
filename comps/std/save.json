@@ -1,0 +1,164 @@
+{
+    "uid": "std:save",
+    "name": "Test_Save",
+    "height": 480.0,
+    "width": 640.0,
+    "components": [
+        {
+            "id": "component0",
+            "uid": "std:latch:sr",
+            "type": "CIRCUIT",
+            "inputs": 0.0,
+            "position": {
+                "x": 346.0,
+                "y": 158.0
+            }
+        },
+        {
+            "id": "component1",
+            "type": "INPUT",
+            "inputs": 1.0,
+            "position": {
+                "x": 195.0,
+                "y": 147.0
+            },
+            "high": []
+        },
+        {
+            "id": "component2",
+            "type": "INPUT",
+            "inputs": 1.0,
+            "position": {
+                "x": 196.0,
+                "y": 239.0
+            },
+            "high": []
+        },
+        {
+            "id": "component3",
+            "type": "OUTPUT",
+            "inputs": 1.0,
+            "position": {
+                "x": 485.0,
+                "y": 101.0
+            },
+            "high": []
+        },
+        {
+            "id": "component4",
+            "type": "OUTPUT",
+            "inputs": 1.0,
+            "position": {
+                "x": 482.0,
+                "y": 243.0
+            },
+            "high": [
+                "out"
+            ]
+        }
+    ],
+    "wires": [
+        {
+            "id": "wire0",
+            "segments": [
+                {
+                    "x": 456.0,
+                    "y": 126.0
+                }
+            ],
+            "from": {
+                "component": "component0",
+                "pin": "component2"
+            },
+            "to": {
+                "component": "component3",
+                "pin": "in"
+            }
+        },
+        {
+            "id": "wire1",
+            "segments": [
+                {
+                    "x": 456.0,
+                    "y": 268.0
+                }
+            ],
+            "from": {
+                "component": "component0",
+                "pin": "component5"
+            },
+            "to": {
+                "component": "component4",
+                "pin": "in"
+            }
+        },
+        {
+            "id": "wire2",
+            "segments": [
+                {
+                    "x": 285.0,
+                    "y": 172.0
+                },
+                {
+                    "x": 285.0,
+                    "y": 191.33333333333331
+                }
+            ],
+            "from": {
+                "component": "component1",
+                "pin": "out"
+            },
+            "to": {
+                "component": "component0",
+                "pin": "component0"
+            }
+        },
+        {
+            "id": "wire3",
+            "segments": [
+                {
+                    "x": 290.0,
+                    "y": 264.0
+                },
+                {
+                    "x": 290.0,
+                    "y": 224.66666666666666
+                }
+            ],
+            "from": {
+                "component": "component2",
+                "pin": "out"
+            },
+            "to": {
+                "component": "component0",
+                "pin": "component1"
+            }
+        }
+    ],
+    "pins": [
+        {
+            "id": "component1",
+            "direction": "LEFT",
+            "input": true,
+            "name": "X0"
+        },
+        {
+            "id": "component2",
+            "direction": "LEFT",
+            "input": true,
+            "name": "X1"
+        },
+        {
+            "id": "component3",
+            "direction": "RIGHT",
+            "input": false,
+            "name": "Q0"
+        },
+        {
+            "id": "component4",
+            "direction": "RIGHT",
+            "input": false,
+            "name": "Q1"
+        }
+    ]
+}
