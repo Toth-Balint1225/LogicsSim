@@ -6,7 +6,7 @@
     "components": [
         {
             "id": "component0",
-            "uid": "std:sr",
+            "uid": "std:latch:sr",
             "type": "CIRCUIT",
             "inputs": 0.0,
             "position": {

@@ -86,9 +86,8 @@ public class WorkspaceData {
             return Optional.empty();
 
         // create the workspace 
-        Workspace ws = new Workspace();
+        Workspace ws = new Workspace(uid,name);
         ws.getPane().setPrefSize(width,height);
-        ws.setName(name);
 
         // add component graphics
         for (Component c : components) {

@@ -4,26 +4,43 @@ import java.io.File;
 
 import hu.uni_pannon.sim.data.ComponentLoader;
 import hu.uni_pannon.sim.data.Serializer;
-import javafx.application.Application;
 import javafx.event.Event;
 import javafx.fxml.FXML;
+import javafx.scene.Cursor;
+import javafx.scene.control.Alert;
 import javafx.scene.control.ListView;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.control.TextInputDialog;
-import javafx.scene.layout.Pane;
+import javafx.scene.control.TreeView;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.FileChooser.ExtensionFilter;
 
-public class Controller {
-    
-    // @FXML
-    // private Pane workPlacePane;
 
+public class Controller {
+    public static class ComponentCellItem {
+        String dispName;
+        String uid;
+
+        public ComponentCellItem(String dispName, String uid) {
+            this.dispName = dispName;
+            this.uid = uid;
+        }
+
+        @Override
+        public String toString() {
+            return dispName;
+        }
+    }
+
+    
     @FXML
-    private ListView<String> componentSelectorListView;
+    private ListView<String> gateSelectorListView;
+    @FXML
+    private ListView<String> ioSelectorListView;
+    @FXML
+    private TreeView<ComponentCellItem> componentSelectorTreeView;
 
     @FXML
     private TabPane mainTabPane;
@@ -32,6 +49,9 @@ public class Controller {
     private Workspace workspace;
     private Thread refreshThread;
     private volatile boolean refreshThreadActive = false;
+
+    // state flags
+    private boolean spawningGate = false, spawningIO = false, spawningIC = false;
 
     @FXML
     private void loadWorkspace(Event e) {
@@ -47,6 +67,8 @@ public class Controller {
             Serializer.readWorkspaceFromFile(selected.getAbsolutePath()).ifPresent(wsd -> {
                 wsd.toWorkspace().ifPresent(ws -> {
                     this.workspace = ws;
+                    workspace.setFileName(selected.getAbsolutePath());
+                    workspace.setParent(this);
                     WorkspaceTab wst = new WorkspaceTab(ws);
                     mainTabPane.getTabs().add(wst);
                 });
@@ -56,27 +78,42 @@ public class Controller {
 
     @FXML
     private void saveWorkspace(Event e) {
-        // dialog to set name
-        TextInputDialog nameDialog = new TextInputDialog("Workspace");
-        nameDialog.setTitle("Workspace Name");
-        nameDialog.setHeaderText("Set workspace name");
-        nameDialog.showAndWait().ifPresent(name -> {
-            TextInputDialog uidDialog = new TextInputDialog("tmp:tmp");
-            uidDialog.setTitle("Workspace uid");
-            uidDialog.setHeaderText("Set workspace uid");
-            uidDialog.showAndWait().ifPresent(uid -> {
-                FileChooser fc = new FileChooser();
-                fc.setTitle("Save Workspace");
-                fc.getExtensionFilters().addAll(
-                    new ExtensionFilter("Workspaces", "*.json"),
-                    new ExtensionFilter("All Files", "*.*")
-                );
-                File selected = fc.showSaveDialog(stage.getOwner());
-                if (selected != null) {
-                    workspace.setName(name);
-                    Serializer.writeWorkspaceToFile(workspace.toData(uid),selected.getAbsolutePath());
-                }
-            });
+        if (workspace == null)
+            return;
+        File selected = null;
+        if (workspace.getFileName().isPresent()) {
+            selected = new File(workspace.getFileName().get());
+        } else {
+            FileChooser fc = new FileChooser();
+            fc.setTitle("Save Workspace");
+            fc.getExtensionFilters().addAll(
+                new ExtensionFilter("Workspaces", "*.json"),
+                new ExtensionFilter("All Files", "*.*")
+            );
+            fc.setInitialFileName(workspace.getName());
+            selected = fc.showSaveDialog(stage.getOwner());
+        }
+        if (selected != null) {
+            workspace.setName(workspace.getName());
+            Serializer.writeWorkspaceToFile(workspace.toData(workspace.getUid()),selected.getAbsolutePath());
+            workspace.setFileName(selected.getAbsolutePath());
+        } else {
+            Alert alert = new Alert(AlertType.ERROR);
+            alert.setContentText("File not found");
+            alert.setHeaderText("Error saving file");
+            alert.showAndWait();
+        }
+    }
+
+    @FXML
+    private void createWorkspace(Event e) {
+        new CreateWorkspaceDialog().show().ifPresent(res -> {
+            Workspace ws = new Workspace(res.uid, res.name);
+            ws.getPane().setPrefSize(res.width,res.height);
+            this.workspace = ws;
+            workspace.setParent(this);
+            WorkspaceTab wst = new WorkspaceTab(ws);
+            mainTabPane.getTabs().add(wst);
         });
     }
     
@@ -89,12 +126,63 @@ public class Controller {
         mainTabPane.getSelectionModel().selectedItemProperty().addListener((ov, oldT, newT) -> {
             workspace = ((WorkspaceTab)newT).getWorkspace();
         });
+
+
+        // populate gates
+        gateSelectorListView.getItems().addAll("AND", "OR", "XOR", "NOT", "NAND", "NOR", "XNOR", "BUFFER", "HIGH", "LOW");
+        gateSelectorListView.addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
+            if (spawningGate)
+                return;
+            
+            spawningGate = true;
+            workspace.getPane().setCursor(Cursor.CROSSHAIR);
+        });
+        // populate io
+        ioSelectorListView.getItems().addAll("INPUT", "OUTPUT");
+        ioSelectorListView.addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
+            if (spawningIO)
+                return;
+            
+            spawningIO = true;
+            workspace.getPane().setCursor(Cursor.CROSSHAIR);
+        });
+        // populate components
+        componentSelectorTreeView.setShowRoot(false);
+        componentSelectorTreeView.setRoot(ComponentLoader.getInstance().componentTree());
+        componentSelectorTreeView.addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
+            if (spawningIC)
+                return;
+            
+            spawningIC = true;
+            workspace.getPane().setCursor(Cursor.CROSSHAIR);
+        });
+
+    }
+
+    public void handleMouseReleased(double x, double y) {
+        if (spawningGate) {
+            workspace.spawnGate(gateSelectorListView.getSelectionModel().getSelectedItem(), 2, x, y);
+            gateSelectorListView.getSelectionModel().clearSelection();
+        } else if (spawningIO) {
+            workspace.spawnGate(ioSelectorListView.getSelectionModel().getSelectedItem(), 2, x, y);
+            ioSelectorListView.getSelectionModel().clearSelection();
+        } else if (spawningIC) {
+            workspace.spawnIntegratedComponent(
+                componentSelectorTreeView.getSelectionModel().getSelectedItem().getValue().uid, x, y);
+            componentSelectorTreeView.getSelectionModel().clearSelection();
+        } else {
+            return;
+        }
+        spawningGate = false;
+        spawningIO = false;
+        spawningIC = false;
+        workspace.getPane().setCursor(Cursor.DEFAULT);
     }
 
 
     @FXML
     public void onStepButtonClicked(Event e) {
-        if (!isRefreshThreadActive())
+        if (!isRefreshThreadActive() && workspace != null)
             evaluate();
     }
 
@@ -114,6 +202,8 @@ public class Controller {
     }
 
     public synchronized void startRefreshThread() {
+        if (workspace == null)
+            return;
         if (refreshThreadActive)
             return;
         refreshThreadActive = true;
@@ -131,6 +221,8 @@ public class Controller {
     }
 
     public synchronized void stopRefreshThread() {
+        if (workspace == null)
+            return;
         if (!refreshThreadActive)
             return;
         refreshThreadActive = false;

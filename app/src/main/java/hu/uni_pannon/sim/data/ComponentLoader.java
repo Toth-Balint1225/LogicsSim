@@ -1,6 +1,10 @@
 package hu.uni_pannon.sim.data;
 
+import java.io.File;
 import java.util.Optional;
+
+import hu.uni_pannon.sim.exp.Controller;
+import javafx.scene.control.TreeItem;
 
 public class ComponentLoader {
     
@@ -36,4 +40,26 @@ public class ComponentLoader {
     public Optional<TypeData> locateComponent(String uid) {
         return Serializer.readTypeFromFile(givePathFromUid(uid));
     }
+
+    public TreeItem<Controller.ComponentCellItem> componentTree() {
+        File rootDir = new File(COM_DIR);
+        return treeFromFile(rootDir,"",true);
+    }
+
+    private TreeItem<Controller.ComponentCellItem> treeFromFile(File f, String base, boolean root) {
+        if (f.isDirectory()) {
+            TreeItem<Controller.ComponentCellItem> res = new TreeItem<>(
+                new Controller.ComponentCellItem(f.getName(),""));
+            for (File it : f.listFiles()) {
+                res.getChildren().add(treeFromFile(it,(root ? "" : base + f.getName() + ":"), false));
+            }
+            return res;
+        } else {
+            System.out.println(f.getName());
+            String name = f.getName().split("\\.")[0];
+            return new TreeItem<Controller.ComponentCellItem>(
+                new Controller.ComponentCellItem(name,base + name));
+        }
+    }
+
 }

@@ -177,7 +177,7 @@ public class Component {
     }
 
         // this is just a getter now
-    public Optional<Boolean> getActualState(String output) {
+    public synchronized Optional<Boolean> getActualState(String output) {
         // System.out.println("[EVAL] getting value of " + output);
         boolean res = false;
         try {
@@ -202,7 +202,7 @@ public class Component {
 
     }
 
-    public void genNextState() {
+    public synchronized void genNextState() {
         // System.out.println("[STATE] generating next state");
         List<String> activeIns = new LinkedList<>();
         for (String it : ins.keySet()) {

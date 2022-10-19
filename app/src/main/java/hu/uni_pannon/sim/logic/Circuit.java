@@ -59,7 +59,7 @@ public class Circuit {
     /**
      * Evaluation of the whole circuit.
      */
-    public void evaluate() {
+    public synchronized void evaluate() {
 	// System.out.println("[CIRCUIT] eval started");
 	// evaluate all with the actual states 
         for (Map.Entry<String,Component> entry : components.entrySet()) {

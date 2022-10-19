@@ -1,4 +1,4 @@
-package hu.uni_pannon.sim.exp;
+package hu.uni_pannon.sim.util;
 
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.DoubleProperty;

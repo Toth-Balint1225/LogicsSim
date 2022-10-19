@@ -30,6 +30,7 @@ public final class Workspace extends Group {
 
     // model
     private String name;
+    private String uid;
     private Circuit model;
 
     // state flags
@@ -38,6 +39,10 @@ public final class Workspace extends Group {
     private boolean hoveringOnComponent = false;
     private boolean movingComponent = false;
     private boolean drawingWire = false;
+
+    // some information for the control
+    private Optional<String> fileName;
+    private Controller parent;
 
     private String componentId() {
         int compNumber = 0;
@@ -64,8 +69,11 @@ public final class Workspace extends Group {
     }
     
 
-    public Workspace() {
+    public Workspace(String uid, String name) {
+        this.uid = uid;
+        this.name = name;
         this.pane = new Pane();
+        this.fileName = Optional.empty();
 
         this.model = new Circuit();
 
@@ -77,6 +85,11 @@ public final class Workspace extends Group {
         wires = new TreeMap<>();
 
         nextWire = new GraphicalWire(this,"");
+        Rectangle background = new Rectangle();
+        background.widthProperty().bind(pane.widthProperty());
+        background.heightProperty().bind(pane.heightProperty());
+        background.setFill(Color.WHITE);
+        pane.getChildren().add(background);
 
         pane.getChildren().add(this);
         pane.addEventHandler(MouseEvent.MOUSE_DRAGGED, evt -> {
@@ -115,7 +128,7 @@ public final class Workspace extends Group {
             tempLines[3].setEndY(evt.getY());
         });
 
-        pane.addEventHandler(MouseEvent.MOUSE_RELEASED, evt -> {
+        pane.addEventFilter(MouseEvent.MOUSE_RELEASED, evt -> {
             drawingSelection = false;
             selectionPresent = true;
         });
@@ -137,6 +150,13 @@ public final class Workspace extends Group {
         });
     }
 
+    public void setParent(Controller c) {
+        parent = c;
+        pane.addEventFilter(MouseEvent.MOUSE_RELEASED, evt -> {
+            parent.handleMouseReleased(evt.getX(), evt.getY());
+        });
+    }
+
     public Circuit getModel() {
         return model;
     }
@@ -151,6 +171,22 @@ public final class Workspace extends Group {
 
     public String getName() {
         return name;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = Optional.of(fileName);
+    }
+
+    public Optional<String> getFileName() {
+        return fileName;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
     public Map<String,GraphicalWire> getWires() {

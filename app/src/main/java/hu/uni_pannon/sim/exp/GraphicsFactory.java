@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import hu.uni_pannon.sim.data.WorkspaceData;
+import hu.uni_pannon.sim.util.Label;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
 import javafx.scene.Group;

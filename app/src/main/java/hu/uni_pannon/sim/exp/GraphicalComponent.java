@@ -1,6 +1,8 @@
 package hu.uni_pannon.sim.exp;
 
 import javafx.scene.Group;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -119,7 +121,24 @@ public class GraphicalComponent {
         });
         graphics.addEventHandler(MouseEvent.MOUSE_PRESSED, evt -> {
             if (evt.isSecondaryButtonDown()) {
-                remove();
+                if (typeString.equals("OUTPUT") || typeString.equals("INPUT")) {
+                    ContextMenu menu = new ContextMenu();
+                    MenuItem settings = new MenuItem("Settings");
+                    settings.setOnAction(e -> {
+                        new IOSettingsDialog().show(name,direction.orElse(null)).ifPresent(res -> {
+                            this.name = res.name;
+                            this.direction = Optional.of(res.direction);
+                        });
+                    });
+                    MenuItem remove = new MenuItem("Remove");
+                    remove.setOnAction(e -> {
+                        remove();
+                    });
+                    menu.getItems().addAll(settings, remove);
+                    menu.show(graphics, evt.getScreenX(), evt.getScreenY());
+                } else {
+                    remove();
+                }
             } else {
                 parent.componentActivity(ActivityType.ACT_PRESS, this.id);
 

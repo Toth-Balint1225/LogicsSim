@@ -33,17 +33,6 @@ public class App extends Application {
         primaryStage.show();
     }
 
-    //@Override
-    public void start3(Stage primaryStage) throws Exception {
-        primaryStage.setTitle("Experimental");
-
-        Workspace ws = new Workspace();
-        ws.getPane().setPrefSize(640,480);
-        primaryStage.setScene(new Scene(ws.getPane()));
-        primaryStage.sizeToScene();
-
-        primaryStage.show();
-    }
 
     //@Override
     public void start4(Stage primaryStage) throws Exception {

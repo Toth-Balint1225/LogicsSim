@@ -14,27 +14,27 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="666.0" prefWidth="960.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="hu.uni_pannon.sim.exp.Controller">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="585.0" prefWidth="819.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="hu.uni_pannon.sim.exp.Controller">
    <bottom>
       <HBox prefHeight="15.0" prefWidth="600.0" BorderPane.alignment="CENTER" />
    </bottom>
    <left>
       <VBox prefHeight="440.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <children>
-            <Accordion maxHeight="1.7976931348623157E308">
+            <Accordion maxHeight="1.7976931348623157E308" VBox.vgrow="ALWAYS">
               <panes>
-                <TitledPane animated="false" prefWidth="200.0" text="Gates">
+                <TitledPane animated="false" maxHeight="1.7976931348623157E308" prefWidth="200.0" text="Gates">
                      <content>
-                        <ListView fx:id="componentSelectorListView" prefHeight="200.0" prefWidth="200.0" />
+                        <ListView fx:id="gateSelectorListView" prefHeight="200.0" prefWidth="200.0" />
                      </content></TitledPane>
-                  <TitledPane animated="false" prefWidth="200.0" text="I/O">
+                  <TitledPane animated="false" maxHeight="1.7976931348623157E308" prefHeight="80.0" prefWidth="200.0" text="I/O">
                      <content>
-                        <ListView prefWidth="200.0" />
+                        <ListView fx:id="ioSelectorListView" prefHeight="0.0" prefWidth="198.0" />
                      </content>
                   </TitledPane>
-                  <TitledPane animated="false" prefWidth="200.0" text="Components">
+                  <TitledPane fx:id="componentSelectorTableView" animated="false" maxHeight="1.7976931348623157E308" prefWidth="200.0" text="Components">
                      <content>
-                        <TreeView prefWidth="198.0" />
+                        <TreeView fx:id="componentSelectorTreeView" prefWidth="198.0" />
                      </content>
                   </TitledPane>
               </panes>
@@ -51,6 +51,7 @@
                   <items>
                         <MenuItem mnemonicParsing="false" onAction="#loadWorkspace" text="Open Workspace" />
                         <MenuItem mnemonicParsing="false" onAction="#saveWorkspace" text="Save Workspace" />
+                        <MenuItem mnemonicParsing="false" onAction="#createWorkspace" text="New Workspace" />
                     <MenuItem mnemonicParsing="false" text="Close" />
                   </items>
                 </Menu>
