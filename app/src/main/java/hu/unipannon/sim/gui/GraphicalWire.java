@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
+import hu.unipannon.sim.Settings;
 import hu.unipannon.sim.data.WorkspaceData;
 import hu.unipannon.sim.logic.Component;
 import hu.unipannon.sim.logic.Wire;
@@ -99,7 +100,7 @@ public class GraphicalWire {
             color(Color.GREEN);
             break;
         case ACT_EXIT:
-            color(Color.BLACK);
+            color(Settings.getInstance().getTheme().foreground);
             break;
         case ACT_DRAG:
             dragSegment(segmentIndex, x, y);
@@ -235,6 +236,7 @@ public class GraphicalWire {
         nextSegment.line.startYProperty().set(startY);
         nextSegment.line.endXProperty().set(startX);
         nextSegment.line.endYProperty().set(startY);
+        nextSegment.line.setStroke(Settings.getInstance().getTheme().foreground);
         nextSegment.fix = false;
 	}
 
@@ -256,6 +258,7 @@ public class GraphicalWire {
         nextSegment.line.startYProperty().bind(y);
         nextSegment.line.setEndX(x.get());
         nextSegment.line.setEndY(y.get());
+        nextSegment.line.setStroke(Settings.getInstance().getTheme().foreground);
         nextSegment.fix = true;
 	}
 
@@ -439,9 +442,9 @@ public class GraphicalWire {
     public void update() {
         model.getActualState(outPin).ifPresent(state -> {
             if (state)
-                color(Color.BLUE);
+                color(Settings.getInstance().getTheme().active);
             else
-                color(Color.BLACK);
+                color(Settings.getInstance().getTheme().foreground);
         });
     }
 }

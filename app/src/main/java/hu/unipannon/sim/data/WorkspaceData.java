@@ -91,7 +91,10 @@ public class WorkspaceData {
 
         // add component graphics
         for (Component c : components) {
-            giveGraphical(c).ifPresent(gc -> {     
+            var comp = giveGraphical(c);
+            if (!comp.isPresent())
+                return Optional.empty();
+            comp.ifPresent(gc -> {     
                 if (GraphicsFactory.giveFromString(gc,c.type)) {
                     gc.xProperty().set(c.position.x);
                     gc.yProperty().set(c.position.y);
@@ -180,7 +183,7 @@ public class WorkspaceData {
                     });
                 });
         } else {
-            // GET MONADED YO
+            // GET MONADED 
             return GateFactory.fromString(c.type, (int)c.inputs).flatMap(comp -> {
                 GraphicalComponent gc = new GraphicalComponent(c.id, comp);
                 return Optional.of(gc);

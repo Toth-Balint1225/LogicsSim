@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
 
+import hu.unipannon.sim.Settings;
 import hu.unipannon.sim.data.WorkspaceData;
 import hu.unipannon.sim.logic.Component;
 import hu.unipannon.sim.logic.Input;
@@ -43,7 +44,13 @@ public class GraphicalComponent {
     private String name;
     private Optional<String> direction;
 
+    private Paint backgroundColor;
+    private Paint activeColor;
+
     public GraphicalComponent(String id, Component model) {
+        var settings = Settings.getInstance();
+        backgroundColor = settings.getTheme().background;
+        activeColor = settings.getTheme().active;
         this.id = id;
         this.model = model;
         this.uid = Optional.empty();
@@ -237,10 +244,10 @@ public class GraphicalComponent {
             model.getActualState("out").ifPresent(state -> {
                 Paint col;
                 if (state.booleanValue()) {
-                    col = Color.WHITE;
+                    col = backgroundColor;
                     ((Input)model).low();
                 } else  {
-                    col = Color.BLUE;
+                    col = activeColor;
                     ((Input)model).high();
                 }
                 graphics.getChildren().filtered(node -> node instanceof Circle)
@@ -258,9 +265,9 @@ public class GraphicalComponent {
             model.getActualState("out").ifPresent(state -> {
                 Paint col;
                 if (state.booleanValue())
-                    col = Color.BLUE;
+                    col = activeColor;
                 else 
-                    col = Color.WHITE;
+                    col = backgroundColor;
                 graphics.getChildren().filtered(node -> node instanceof Circle)
                     .stream()
                     .map(c -> (Circle)c)

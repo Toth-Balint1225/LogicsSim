@@ -3,12 +3,17 @@ package hu.unipannon.sim.gui;
 import java.io.File;
 
 import hu.unipannon.sim.data.ComponentLoader;
+import hu.unipannon.sim.data.JsonParser;
 import hu.unipannon.sim.data.Serializer;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TreeView;
 import javafx.scene.control.Alert.AlertType;
@@ -45,6 +50,9 @@ public class Controller {
     @FXML
     private TabPane mainTabPane;
 
+    @FXML
+    private Label filenameLabel;
+
     private Stage stage;
     private Workspace workspace;
     private Thread refreshThread;
@@ -65,13 +73,21 @@ public class Controller {
         File selected = fc.showOpenDialog(stage.getOwner());
         if (selected != null) {
             Serializer.readWorkspaceFromFile(selected.getAbsolutePath()).ifPresent(wsd -> {
-                wsd.toWorkspace().ifPresent(ws -> {
+                var wsdo = wsd.toWorkspace();
+                if (wsdo.isPresent())
+                {
+                    var ws = wsdo.get();
                     this.workspace = ws;
                     workspace.setFileName(selected.getAbsolutePath());
                     workspace.setParent(this);
                     WorkspaceTab wst = new WorkspaceTab(ws);
                     mainTabPane.getTabs().add(wst);
-                });
+                } else {
+                    Alert err = new Alert(AlertType.ERROR);
+                    err.setTitle("Workspace loading error");
+                    err.setContentText("Error loading " + selected);
+                    err.show();
+                }
             });
         }
     }
@@ -116,15 +132,31 @@ public class Controller {
             mainTabPane.getTabs().add(wst);
         });
     }
+
+    @FXML
+    private void createType(Event e) {
+        new TypeCreatorWizard().show().ifPresent(res -> {
+            System.out.println(JsonParser.getInstance().toJson(res));
+        });
+        System.out.println("Type creation finished");
+    }
     
     public void setStage(Stage stage) {
         this.stage = stage;
     }
 
     @FXML
+    private void showOptions() {
+
+    }
+
+    @FXML
     public void initialize() {
         mainTabPane.getSelectionModel().selectedItemProperty().addListener((ov, oldT, newT) -> {
             workspace = ((WorkspaceTab)newT).getWorkspace();
+            workspace.getFileName().ifPresent(name -> {
+                filenameLabel.setText(name);
+            });
         });
 
 
@@ -152,10 +184,19 @@ public class Controller {
         componentSelectorTreeView.addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
             if (spawningIC || workspace == null)
                 return;
+            if (componentSelectorTreeView.getSelectionModel().getSelectedItem() != null)
+                if (!componentSelectorTreeView.getSelectionModel().getSelectedItem().isLeaf()) 
+                    return;
             
             spawningIC = true;
             workspace.getPane().setCursor(Cursor.CROSSHAIR);
         });
+
+        MenuItem refreshItem = new MenuItem("Refresh");
+        refreshItem.setOnAction(evt -> {
+            componentSelectorTreeView.setRoot(ComponentLoader.getInstance().componentTree());
+        });
+        componentSelectorTreeView.setContextMenu(new ContextMenu(refreshItem));
 
     }
 
@@ -167,8 +208,16 @@ public class Controller {
             workspace.spawnGate(ioSelectorListView.getSelectionModel().getSelectedItem(), 2, x, y);
             ioSelectorListView.getSelectionModel().clearSelection();
         } else if (spawningIC) {
-            workspace.spawnIntegratedComponent(
-                componentSelectorTreeView.getSelectionModel().getSelectedItem().getValue().uid, x, y);
+            if (componentSelectorTreeView.getSelectionModel().getSelectedItem() != null)
+                if (componentSelectorTreeView.getSelectionModel().getSelectedItem().isLeaf()) {
+                    String uid = componentSelectorTreeView.getSelectionModel().getSelectedItem().getValue().uid;
+                    if (!workspace.spawnIntegratedComponent(uid, x, y)) {
+                        var err = new Alert(AlertType.ERROR);
+                        err.setTitle("Component loading error");
+                        err.setContentText("Component " + uid + " cannot be loaded");
+                        err.show();
+                    }
+                }
             componentSelectorTreeView.getSelectionModel().clearSelection();
         } else {
             return;
@@ -196,7 +245,7 @@ public class Controller {
         stopRefreshThread();
     }
 
-    private void evaluate() {
+    private synchronized void evaluate() {
         workspace.getModel().evaluate();
         workspace.update();
     }

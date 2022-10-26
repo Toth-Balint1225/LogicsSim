@@ -2,6 +2,7 @@ package hu.unipannon.sim.gui;
 
 import java.util.Optional;
 
+import hu.unipannon.sim.Settings;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -65,7 +66,9 @@ public class IOSettingsDialog {
         root.add(dirComboBox, 1, 1);
         root.add(buttonRow, 1, 2);
 
-        stage.setScene(new Scene(root));
+        Scene scene = new Scene(root);
+        scene.getStylesheets().add(getClass().getResource(Settings.getInstance().getData().theme + ".css").toExternalForm());
+        stage.setScene(scene);
         stage.showAndWait();
         if (res == null)
             return Optional.empty();

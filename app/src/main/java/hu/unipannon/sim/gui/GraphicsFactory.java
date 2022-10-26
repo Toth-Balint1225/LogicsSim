@@ -4,12 +4,12 @@ package hu.unipannon.sim.gui;
 import java.util.LinkedList;
 import java.util.List;
 
+import hu.unipannon.sim.Settings;
 import hu.unipannon.sim.data.WorkspaceData;
 import hu.unipannon.sim.util.Label;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
 import javafx.scene.Group;
-import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.ArcTo;
 import javafx.scene.shape.Circle;
@@ -22,13 +22,26 @@ import javafx.scene.text.FontWeight;
 
 public class GraphicsFactory {
 
-    private static double radius = 5.0;
-    private static double strokeWidth = 2.0;
-    private static Paint foreground = Color.BLACK;
-    private static Paint background = Color.WHITE;
-    // shapes
+    private double radius = 5.0;
+    private double strokeWidth = 2.0;
+    private Paint foreground;
+    private Paint background;
 
-    private static Group shapeAnd(GraphicalComponent c) {
+    private static GraphicsFactory instance = null;
+    private GraphicsFactory() {
+        var settings = Settings.getInstance();
+        foreground = settings.getTheme().foreground;
+        background = settings.getTheme().background;
+    }
+
+    public static GraphicsFactory getInstance() {
+        if (instance == null)
+            instance = new GraphicsFactory();
+        return instance;
+    }
+
+    // shapes
+    private Group shapeAnd(GraphicalComponent c) {
         Path path = new Path();
         
         MoveTo init = new MoveTo();
@@ -63,7 +76,7 @@ public class GraphicsFactory {
         return res;
     }
 
-    private static Group shapeOr(GraphicalComponent c) {
+    private Group shapeOr(GraphicalComponent c) {
         Path path = new Path();
         MoveTo init = new MoveTo();
         init.xProperty().bind(c.xProperty());
@@ -106,7 +119,7 @@ public class GraphicsFactory {
         return res;
     }
 
-    private static Group shapeBuffer(GraphicalComponent c) {
+    private Group shapeBuffer(GraphicalComponent c) {
         Path path = new Path();
         MoveTo init = new MoveTo();
         init.xProperty().bind(c.xProperty());
@@ -135,7 +148,7 @@ public class GraphicsFactory {
         return res;
     }
 
-    private static Group shapeConstant(GraphicalComponent c) {
+    private Group shapeConstant(GraphicalComponent c) {
         Rectangle rect = new Rectangle();
         rect.xProperty().bind(c.xProperty());
         rect.yProperty().bind(c.yProperty());
@@ -149,7 +162,7 @@ public class GraphicsFactory {
         return res;
     }
 
-    private static void negateRing(Group group, GraphicalComponent component) {
+    private void negateRing(Group group, GraphicalComponent component) {
         Circle c = new Circle();
         c.centerXProperty().bind(component.xProperty().add(component.getSize() + radius));
         c.centerYProperty().bind(component.yProperty().add(component.getSize() / 2));
@@ -160,7 +173,7 @@ public class GraphicsFactory {
         group.getChildren().add(c);
     }
 
-    private static void exclusiveLine(Group group, GraphicalComponent component) {
+    private void exclusiveLine(Group group, GraphicalComponent component) {
         Path p = new Path();
         MoveTo mt = new MoveTo();
         mt.xProperty().bind(component.xProperty().subtract(radius));
@@ -180,7 +193,7 @@ public class GraphicsFactory {
         group.getChildren().addAll(p);
     }
 
-    private static void pinsAnd(GraphicalComponent c, boolean negate) {
+    private void pinsAnd(GraphicalComponent c, boolean negate) {
         // setup the pins
         List<String> ins = c.getModel().getLUT().inputs();
         List<String> outs = c.getModel().getLUT().outputs();
@@ -206,7 +219,7 @@ public class GraphicsFactory {
 
     }
 
-    private static void pinsOr(GraphicalComponent c, boolean negate) {
+    private void pinsOr(GraphicalComponent c, boolean negate) {
         List<String> ins = c.getModel().getLUT().inputs();
         List<String> outs = c.getModel().getLUT().outputs();
 
@@ -230,7 +243,7 @@ public class GraphicsFactory {
         c.addPin(outs.get(0),p);
     }
 
-    private static void pinsBuffer(GraphicalComponent c, boolean negate) {
+    private void pinsBuffer(GraphicalComponent c, boolean negate) {
         List<String> ins = c.getModel().getLUT().inputs();
         List<String> outs = c.getModel().getLUT().outputs();
 
@@ -252,53 +265,53 @@ public class GraphicsFactory {
         c.addPin(outs.get(0),out);
     }
 
-    public static void giveAnd(GraphicalComponent c) {
+    public void giveAnd(GraphicalComponent c) {
         Group res = shapeAnd(c);
         c.setGraphics(res);
         pinsAnd(c, false);
     }
 
-    public static void giveOr(GraphicalComponent c) {
+    public void giveOr(GraphicalComponent c) {
         Group res = shapeOr(c);
         c.setGraphics(res);
         pinsOr(c, false);
     }
 
-    public static void giveBuffer(GraphicalComponent c) {
+    public void giveBuffer(GraphicalComponent c) {
         Group res = shapeBuffer(c);
         c.setGraphics(res);
         pinsBuffer(c, false);
     }
 
-    public static void giveNot(GraphicalComponent c) {
+    public void giveNot(GraphicalComponent c) {
         Group res = shapeBuffer(c);
         negateRing(res,c);
         c.setGraphics(res);
         pinsBuffer(c, true);
     }
 
-    public static void giveXor(GraphicalComponent c) {
+    public void giveXor(GraphicalComponent c) {
         Group res = shapeOr(c);
         exclusiveLine(res,c);
         c.setGraphics(res);
         pinsOr(c,false);
     }
 
-    public static void giveNand(GraphicalComponent c) {
+    public void giveNand(GraphicalComponent c) {
         Group res = shapeAnd(c);
         negateRing(res,c);
         c.setGraphics(res);
         pinsAnd(c, true);
     }
 
-    public static void giveNor(GraphicalComponent c) {
+    public void giveNor(GraphicalComponent c) {
         Group res = shapeOr(c);
         negateRing(res,c);
         c.setGraphics(res);
         pinsOr(c, true);
     }
 
-    public static void giveXnor(GraphicalComponent c) {
+    public void giveXnor(GraphicalComponent c) {
         Group res = shapeOr(c);
         exclusiveLine(res,c);
         negateRing(res, c);
@@ -306,7 +319,7 @@ public class GraphicsFactory {
         pinsOr(c, true);
     }
 
-    public static boolean giveCustom(GraphicalComponent c) {
+    public boolean giveCustom(GraphicalComponent c) {
         // base
         c.getPinLocations().ifPresent(pins -> {
             Group res = new Group();
@@ -360,6 +373,7 @@ public class GraphicsFactory {
                 return;
             }
             Label nameLab = new Label(c.getName().get());
+            nameLab.setStroke(foreground);
             nameLab.align(HPos.CENTER, VPos.CENTER);
             nameLab.position(c.xProperty().add((widthCount * c.getSize()) / 2), 
                             c.yProperty().add((heightCount * c.getSize()) / 2));
@@ -371,6 +385,7 @@ public class GraphicsFactory {
             // pin labels
             for (WorkspaceData.Pin p : tops) {
                 Label l = new Label(p.name);
+                l.setStroke(foreground);
                 l.align(HPos.CENTER,VPos.TOP);
                 double offsetX = i / (tops.size() + 1) * (c.getSize() * widthCount);
                 l.position(c.xProperty().add(offsetX),c.yProperty().multiply(1));
@@ -389,6 +404,7 @@ public class GraphicsFactory {
             i = 1;
             for (WorkspaceData.Pin p : bots) {
                 Label l = new Label(p.name);
+                l.setStroke(foreground);
                 l.align(HPos.CENTER,VPos.BOTTOM);
                 double offsetX = i / (bots.size() + 1) * (c.getSize() * widthCount);
                 double offsetY = heightCount * c.getSize();
@@ -408,6 +424,7 @@ public class GraphicsFactory {
             i = 1;
             for (WorkspaceData.Pin p : lefts) {
                 Label l = new Label(p.name);
+                l.setStroke(foreground);
                 l.align(HPos.LEFT,VPos.CENTER);
                 double offsetX = 0;
                 double offsetY = i / (lefts.size() + 1) * (c.getSize() * heightCount);
@@ -427,6 +444,7 @@ public class GraphicsFactory {
             i = 1;
             for (WorkspaceData.Pin p : rights) {
                 Label l = new Label(p.name);
+                l.setStroke(foreground);
                 l.align(HPos.RIGHT,VPos.CENTER);
                 double offsetX = widthCount * c.getSize();
                 double offsetY = i / (rights.size() + 1) * (c.getSize() * heightCount);
@@ -446,12 +464,13 @@ public class GraphicsFactory {
         return true;
     }
 
-    public static void giveHighConstant(GraphicalComponent c) {
+    public void giveHighConstant(GraphicalComponent c) {
         Group res = shapeConstant(c);
         Label l = new Label("1");
         l.setFont("Arial", FontWeight.BOLD, 24);
         l.position(c.xProperty().add(c.getSize() / 2),c.yProperty().add(c.getSize() / 2));
         l.align(HPos.CENTER,VPos.CENTER);
+        l.setStroke(foreground);
         res.getChildren().add(l.getNode());
 
         // add the one pin to rule them all
@@ -465,10 +484,11 @@ public class GraphicsFactory {
         c.setGraphics(res);
     }
 
-    public static void giveLowConstant(GraphicalComponent c) {
+    public void giveLowConstant(GraphicalComponent c) {
         Group res = shapeConstant(c);
         Label l = new Label("0");
         l.setFont("Arial", FontWeight.BOLD, 24);
+        l.setStroke(foreground);
         l.position(c.xProperty().add(c.getSize() / 2),c.yProperty().add(c.getSize() / 2));
         l.align(HPos.CENTER,VPos.CENTER);
         res.getChildren().add(l.getNode());
@@ -484,7 +504,7 @@ public class GraphicsFactory {
         c.setGraphics(res);
     }
 
-    public static void giveInput(GraphicalComponent c) {
+    public void giveInput(GraphicalComponent c) {
         Group res = shapeConstant(c);
 
         // add the one pin to rule them all
@@ -516,7 +536,7 @@ public class GraphicsFactory {
         c.setGraphics(res);
     }
 
-    public static void giveOutput(GraphicalComponent c) {
+    public void giveOutput(GraphicalComponent c) {
         Group res = new Group();
 
         Circle ccl = new Circle();
@@ -560,7 +580,7 @@ public class GraphicsFactory {
         c.setGraphics(res);
     }
 
-    public static boolean giveFromString(GraphicalComponent c, String id) {
+    public boolean giveFromStringImpl(GraphicalComponent c, String id) {
         switch (id) {
             case "AND":
                 giveAnd(c);
@@ -606,5 +626,9 @@ public class GraphicsFactory {
                 return false;
         }
         return true;
+    }
+
+    public static boolean giveFromString(GraphicalComponent c, String id ) {
+        return getInstance().giveFromStringImpl(c, id);
     }
 }

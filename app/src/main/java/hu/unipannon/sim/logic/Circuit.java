@@ -13,7 +13,7 @@ public class Circuit {
     /**
      * The main container map.
      */
-    private Map<String,Component> components;
+    private volatile Map<String,Component> components;
 
     /**
      * Default constructor.
@@ -28,7 +28,7 @@ public class Circuit {
      * @param c the component to be associated with the id.
      * TODO: check if the component id id already in the circuit
      */
-    public void add(String id, Component c) {
+    public synchronized void add(String id, Component c) {
         components.put(id, c);
     }
 
@@ -37,7 +37,7 @@ public class Circuit {
      * @param id component to be removed
      * TODO: check id correctness
      */
-    public void remove(String id) {
+    public synchronized void remove(String id) {
         try {
             components.remove(id);
         } catch (Exception e) {
@@ -52,7 +52,7 @@ public class Circuit {
      * @param id the id of the compontent to be queried.
      * @return
      */
-    public Component getComponentById(String id) {
+    public synchronized Component getComponentById(String id) {
         return components.get(id);
     }
 
@@ -81,7 +81,7 @@ public class Circuit {
         }
     }
 
-    public Map<String,Component> getComponents() {
+    public synchronized Map<String,Component> getComponents() {
         return components;
     } 
 }

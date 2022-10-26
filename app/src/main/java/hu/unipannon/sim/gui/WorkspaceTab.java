@@ -17,7 +17,7 @@ public class WorkspaceTab extends Tab {
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.fitToHeightProperty().set(false);
         scrollPane.fitToWidthProperty().set(false);
-        scrollPane.setContent(ws.getPane());
+        scrollPane.setContent(workspace.getPane());
         scrollPane.setHbarPolicy(ScrollBarPolicy.AS_NEEDED);
         scrollPane.setVbarPolicy(ScrollBarPolicy.AS_NEEDED);
         setContent(scrollPane);

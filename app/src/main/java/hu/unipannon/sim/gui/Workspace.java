@@ -7,14 +7,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
 
+import hu.unipannon.sim.Settings;
 import hu.unipannon.sim.data.ComponentLoader;
 import hu.unipannon.sim.data.WorkspaceData;
 import hu.unipannon.sim.logic.Circuit;
 import hu.unipannon.sim.logic.gates.GateFactory;
+import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 
@@ -43,6 +44,7 @@ public final class Workspace extends Group {
     // some information for the control
     private Optional<String> fileName;
     private Controller parent;
+    private Settings settings;
 
     private String componentId() {
         int compNumber = 0;
@@ -70,6 +72,7 @@ public final class Workspace extends Group {
     
 
     public Workspace(String uid, String name) {
+        settings = Settings.getInstance();
         this.uid = uid;
         this.name = name;
         this.pane = new Pane();
@@ -78,24 +81,21 @@ public final class Workspace extends Group {
         this.model = new Circuit();
 
         background = new Rectangle();
-        background.setFill(Color.LIGHTGREY);
+        background.setFill(settings.getTheme().background);
+        background.widthProperty().bind(pane.widthProperty());
+        background.heightProperty().bind(pane.heightProperty());
         getChildren().add(background);
         
         components = new TreeMap<>();
         wires = new TreeMap<>();
 
         nextWire = new GraphicalWire(this,"");
-        Rectangle background = new Rectangle();
-        background.widthProperty().bind(pane.widthProperty());
-        background.heightProperty().bind(pane.heightProperty());
-        background.setFill(Color.WHITE);
-        pane.getChildren().add(background);
 
         pane.getChildren().add(this);
         pane.addEventHandler(MouseEvent.MOUSE_DRAGGED, evt -> {
             if (hoveringOnComponent || movingComponent || drawingWire) 
                 return;
-        
+            /*
             if (!drawingSelection) {
                 drawingSelection = true;
                 if (selectionPresent) 
@@ -126,17 +126,22 @@ public final class Workspace extends Group {
             tempLines[1].setEndY(evt.getY());
             tempLines[2].setEndY(evt.getY());
             tempLines[3].setEndY(evt.getY());
+            */
         });
 
+        /*
         pane.addEventFilter(MouseEvent.MOUSE_RELEASED, evt -> {
             drawingSelection = false;
             selectionPresent = true;
         });
+        */
 
         pane.addEventHandler(MouseEvent.MOUSE_PRESSED, evt -> {
+            /*
             if (selectionPresent)
                 getChildren().removeAll(tempLines);
             selectionPresent = false;
+            */
 
             // wire segmenting
             if (nextWire.isDrawingLine() && !hoveringOnComponent) {
@@ -238,17 +243,22 @@ public final class Workspace extends Group {
                             wires.put(nextWire.getId(),nextWire);
                             nextWire = new GraphicalWire(this, wireId());
                             drawingWire = false;
+                            setCursor(Cursor.DEFAULT);
+                            pane.setCursor(Cursor.DEFAULT);
                         });
                     });
                 } 
                 if (!(input || nextWire.isDrawingLine())){
                     getComponentById(compId).ifPresent(c -> {
                             c.getPinById(pinId).ifPresent(p -> {
+                                // start a new wire
                                 nextWire = new GraphicalWire(this,wireId());
                                 nextWire.startLine(p.anchorX(),p.anchorY(),c.getModel(),pinId,compId);
                                 // add to the component
                                 c.addWire(nextWire.getId());
                                 drawingWire = true;
+                                setCursor(Cursor.CROSSHAIR);
+                                pane.setCursor(Cursor.CROSSHAIR);
                             });
                         });
                 } 
@@ -311,24 +321,27 @@ public final class Workspace extends Group {
         });
     }
 
-    public void spawnIntegratedComponent(String uid, double x, double y) {
-        ComponentLoader.getInstance()
+    public boolean spawnIntegratedComponent(String uid, double x, double y) {
+        var comp = ComponentLoader.getInstance()
                 .locateWorkspace(uid).flatMap(wd -> {
                     return wd.toComponent(componentId()).flatMap(gc -> {
                         gc.setPinLocations(wd.pins);
                         gc.setName(wd.name);
                         return Optional.of(gc);
                     });
-                }).ifPresent(gc -> {
-                    if (GraphicsFactory.giveFromString(gc, "CIRCUIT")) {
-                        gc.xProperty().set(x);
-                        gc.yProperty().set(y);
-                        gc.setTypeString("CIRCUIT");
-                        gc.setUid(uid);
-                        gc.addToWorkspace(this);
-                    }
                 });
-
+        if (comp.isPresent()) {
+            var gc = comp.get();
+            if (GraphicsFactory.giveFromString(gc, "CIRCUIT")) {
+                gc.xProperty().set(x);
+                gc.yProperty().set(y);
+                gc.setTypeString("CIRCUIT");
+                // gc.setUid(uid);
+                gc.addToWorkspace(this);
+                return true;
+            }
+        }
+        return false;
     }
 
     public void update() {

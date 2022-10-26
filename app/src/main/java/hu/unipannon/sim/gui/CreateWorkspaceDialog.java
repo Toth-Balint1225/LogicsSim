@@ -2,6 +2,7 @@ package hu.unipannon.sim.gui;
 
 import java.util.Optional;
 
+import hu.unipannon.sim.Settings;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -65,8 +66,6 @@ public class CreateWorkspaceDialog {
 
         Button submitButton = new Button("Create");
         submitButton.setOnAction(evt -> {
-            uidTextField.getText();
-            nameTextField.getText();
             res = new CreateWorkspaceResult(uidTextField.getText()
                                           , nameTextField.getText()
                                           , Integer.parseInt(widthTextField.getText())
@@ -83,7 +82,9 @@ public class CreateWorkspaceDialog {
 
 
         stage.setTitle("Workspace parameters");
-        stage.setScene(new Scene(root));
+        Scene scene = new Scene(root);
+        scene.getStylesheets().add(getClass().getResource(Settings.getInstance().getData().theme + ".css").toExternalForm());
+        stage.setScene(scene);
 
         stage.showAndWait();
         if (res == null)

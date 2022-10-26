@@ -1,5 +1,6 @@
 package hu.unipannon.sim.gui;
 
+import hu.unipannon.sim.Settings;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.Group;
@@ -30,13 +31,14 @@ public class Pin {
         c.setRadius(5);
         xProperty = new SimpleDoubleProperty();
         yProperty = new SimpleDoubleProperty();
-        c.setFill(Color.BLACK);
+        c.setFill(Settings.getInstance().getTheme().foreground);
 
         double length = 10;
 
         l = new Line();
         l.startXProperty().bind(xProperty);
         l.startYProperty().bind(yProperty);
+        l.setStroke(Settings.getInstance().getTheme().foreground);
         c.centerXProperty().bind(l.endXProperty());
         c.centerYProperty().bind(l.endYProperty());
 
@@ -69,7 +71,7 @@ public class Pin {
                 c.setFill(Color.GREEN);
         });
         graphics.addEventHandler(MouseEvent.MOUSE_EXITED,  evt -> {
-            c.setFill(Color.BLACK);
+            c.setFill(Settings.getInstance().getTheme().foreground);
         });
         graphics.addEventHandler(MouseEvent.MOUSE_PRESSED, evt -> {
             this.parent.pinActivity(ActivityType.ACT_PRESS,this.id,this.isInput);

@@ -9,6 +9,7 @@ import javafx.geometry.VPos;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
@@ -86,6 +87,11 @@ public class Label {
     public void setFont(String font,FontWeight weight,int size) {
         t.setFont(Font.font(font,weight,size));
         refresh();
+    }
+
+    public void setStroke(Paint c) {
+        t.setStroke(c);
+        t.setFill(c);
     }
 
     public void rotate(boolean isRotate) {

@@ -10,7 +10,7 @@ public class BufferGate extends Component {
     public BufferGate() {
         init(Arrays.asList("x"),Arrays.asList("buff"));
         try {
-            lut.addEntry(Arrays.asList(),Arrays.asList("buff"));
+            lut.addEntry(Arrays.asList("x"),Arrays.asList("buff"));
         } catch (InvalidParamException ex) {
             System.err.println("Component init error");
             ex.printStackTrace();

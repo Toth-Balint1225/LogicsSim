@@ -8,9 +8,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Optional;
 
+import hu.unipannon.sim.Settings;
+
 public class Serializer {
     private static Optional<String> readSource(String filename) {
         File f = new File(filename);
+        if (!f.exists()) 
+            return Optional.empty();
         BufferedReader reader = null;
         StringBuilder stb = new StringBuilder();
         String line = null;
@@ -68,5 +72,19 @@ public class Serializer {
 
     public static void writeTypeToFile(WorkspaceData data, String filename) {
         writeSource(JsonParser.getInstance().toJson(data), filename);
+    }
+
+    public static Optional<Settings.SettingsData> loadSettings(String filename) {
+        return readSource(filename).flatMap(src -> {
+            try {
+                return Optional.of(JsonParser.getInstance().toClass(src,Settings.SettingsData.class));
+            } catch (Exception e) {
+                return Optional.empty();
+            }
+        });
+    }
+
+    public static void saveSettings(String filename) {
+        writeSource(JsonParser.getInstance().toJson(Settings.getInstance().getData()), filename);
     }
 }
