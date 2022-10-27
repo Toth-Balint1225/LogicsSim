@@ -1,17 +1,21 @@
 package hu.unipannon.sim.data;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
+import hu.unipannon.sim.Settings;
 import hu.unipannon.sim.gui.Controller;
 import javafx.scene.control.TreeItem;
 
 public class ComponentLoader {
     
     // this is the temporary stuff
-    private final String COM_DIR = "C:/users/tothb/Documents/UNIV/Szakdolgozat/LogicsSimulator/comps";
+    private List<String> comDirs;
     
     private ComponentLoader() {
+        comDirs = Arrays.asList(Settings.getInstance().getData().folders);
     }
    
     private static ComponentLoader instance = null;
@@ -22,9 +26,9 @@ public class ComponentLoader {
         return instance;
     }
 
-    private String givePathFromUid(String uid) {
+    private String givePathFromUid(String dir,String uid) {
         String[] parts = uid.split(":");
-        StringBuilder sbr = new StringBuilder(COM_DIR);
+        StringBuilder sbr = new StringBuilder(dir);
         for (String it : parts) {
             sbr.append("/");
             sbr.append(it);
@@ -34,16 +38,34 @@ public class ComponentLoader {
     }
 
     public Optional<WorkspaceData> locateWorkspace(String uid) {
-        return Serializer.readWorkspaceFromFile(givePathFromUid(uid));
+        for (var dir : comDirs) {
+            var loaded = Serializer.readWorkspaceFromFile(givePathFromUid(dir,uid));
+            if (loaded.isPresent()) {
+                if (loaded.get().type.equals("WORKSPACE"))
+                    return loaded;
+            }
+        }
+        return Optional.empty();
     }
 
     public Optional<TypeData> locateComponent(String uid) {
-        return Serializer.readTypeFromFile(givePathFromUid(uid));
-    }
+        for (var dir : comDirs) {
+            var loaded = Serializer.readTypeFromFile(givePathFromUid(dir,uid));
+            if (loaded.isPresent()) {
+                if (loaded.get().type.equals("TYPE"))
+                    return loaded;
+            }
+        }
+        return Optional.empty();    }
 
     public TreeItem<Controller.ComponentCellItem> componentTree() {
-        File rootDir = new File(COM_DIR);
-        return treeFromFile(rootDir,"",true);
+        TreeItem<Controller.ComponentCellItem> res = new TreeItem<>();
+        for (var dir : comDirs) {
+            File rootDir = new File(dir);
+            
+            res.getChildren().add(treeFromFile(rootDir,"",true));
+        }
+        return res;
     }
 
     private TreeItem<Controller.ComponentCellItem> treeFromFile(File f, String base, boolean root) {

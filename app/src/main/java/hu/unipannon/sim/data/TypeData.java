@@ -6,19 +6,12 @@ import java.util.Optional;
 import hu.unipannon.sim.gui.GraphicalComponent;
 import hu.unipannon.sim.gui.GraphicsFactory;
 
+import hu.unipannon.sim.data.WorkspaceData.LUT;
+import hu.unipannon.sim.data.WorkspaceData.LUTEntry;
+
 public class TypeData {
 
-    public static class LUTEntry {
-        public String[] rhs;  // right hand side
-        public String[] lhs;  // left hand side
-    }
-
-    public static class LUT {
-        public String[] inputs;
-        public String[] outputs;
-        public LUTEntry[] entries;
-    }
-
+    public String type;
     public String uid;
     public String name;
     public LUT lut;           

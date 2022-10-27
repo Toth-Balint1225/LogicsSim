@@ -12,10 +12,6 @@
     -fx-opacity: 0;
 }
 
-.tab {
-    -fx-background-insets: 0 1 0 1 , 0, 0;
-    -fx-background-color: #333333;
-}
 
 .tab-pane .tab {
     -fx-background-color: #333333;
@@ -133,13 +129,21 @@
 
 
 /* inputs, dialogs */
-.label, .combo-box-base {
+.label, .combo-box-base, .combo-box .text-field, .combo-box .text-field:focused .combo-box .button {
     -fx-background-color: #333333;
     -fx-text-fill: #d4d4d4;
+    -fx-prompt-text-fill: #d4d4d4;
 }
-
+.text-area, .text-area .content {
+    -fx-background-color: #252526;
+    -fx-text-fill: #d4d4d4;
+}
 .text-field{
     -fx-background-radius: 0;
     -fx-background-color: #383838;
     -fx-text-fill: #d4d4d4;
+}
+
+.check-box {
+    -fx-background-color: #383838;
 }

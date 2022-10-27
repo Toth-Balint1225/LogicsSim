@@ -70,7 +70,7 @@ public class Serializer {
         });
     }
 
-    public static void writeTypeToFile(WorkspaceData data, String filename) {
+    public static void writeTypeToFile(TypeData data, String filename) {
         writeSource(JsonParser.getInstance().toJson(data), filename);
     }
 

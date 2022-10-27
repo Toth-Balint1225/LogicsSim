@@ -68,6 +68,7 @@ public class WorkspaceData {
         public String pin;
     }
 
+    public String type;
     public String uid; // this will be the complicated package thingy
     public String name; // this will be the label of the graphical
     // workspace editing params

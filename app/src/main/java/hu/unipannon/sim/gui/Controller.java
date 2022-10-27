@@ -17,6 +17,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TreeView;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.TabPane.TabClosingPolicy;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -110,7 +111,6 @@ public class Controller {
             selected = fc.showSaveDialog(stage.getOwner());
         }
         if (selected != null) {
-            workspace.setName(workspace.getName());
             Serializer.writeWorkspaceToFile(workspace.toData(workspace.getUid()),selected.getAbsolutePath());
             workspace.setFileName(selected.getAbsolutePath());
         } else {
@@ -123,7 +123,7 @@ public class Controller {
 
     @FXML
     private void createWorkspace(Event e) {
-        new CreateWorkspaceDialog().show().ifPresent(res -> {
+        new CreateWorkspaceDialog().show("", "",2048, 2048).ifPresent(res -> {
             Workspace ws = new Workspace(res.uid, res.name);
             ws.getPane().setPrefSize(res.width,res.height);
             this.workspace = ws;
@@ -136,9 +136,23 @@ public class Controller {
     @FXML
     private void createType(Event e) {
         new TypeCreatorWizard().show().ifPresent(res -> {
-            System.out.println(JsonParser.getInstance().toJson(res));
+            FileChooser fc = new FileChooser();
+            fc.setTitle("Save Workspace");
+            fc.getExtensionFilters().addAll(
+                new ExtensionFilter("Workspaces", "*.json"),
+                new ExtensionFilter("All Files", "*.*")
+            );
+            fc.setInitialFileName(res.name);
+            var selected = fc.showSaveDialog(stage.getOwner());
+            if (selected != null) {
+                Serializer.writeTypeToFile(res,selected.getAbsolutePath());
+            } else {
+                Alert alert = new Alert(AlertType.ERROR);
+                alert.setContentText("File not found");
+                alert.setHeaderText("Error saving file");
+                alert.showAndWait();
+            }
         });
-        System.out.println("Type creation finished");
     }
     
     public void setStage(Stage stage) {
@@ -146,17 +160,39 @@ public class Controller {
     }
 
     @FXML
-    private void showOptions() {
+    private void showAppOptions(Event e) {
+        new AppOptionsDialog().show();
+    }
 
+    @FXML
+    private void showWorkspaceOptions(Event e) {
+        if (workspace == null)
+            return;
+        new CreateWorkspaceDialog().show(workspace.getUid()
+                                       , workspace.getName()
+                                       , workspace.getPane().getPrefWidth()
+                                       , workspace.getPane().getPrefHeight())
+            .ifPresent(res -> {
+                workspace.setName(res.name);
+                workspace.setUid(res.uid);
+                workspace.getPane().setPrefSize(res.width, res.height);
+            });
     }
 
     @FXML
     public void initialize() {
+        mainTabPane.setTabClosingPolicy(TabClosingPolicy.SELECTED_TAB);
+
         mainTabPane.getSelectionModel().selectedItemProperty().addListener((ov, oldT, newT) -> {
-            workspace = ((WorkspaceTab)newT).getWorkspace();
-            workspace.getFileName().ifPresent(name -> {
-                filenameLabel.setText(name);
-            });
+            if (newT == null) {
+                stopRefreshThread();
+                workspace = null;
+            } else {
+                workspace = ((WorkspaceTab)newT).getWorkspace();
+                workspace.getFileName().ifPresent(name -> {
+                    filenameLabel.setText(name);
+                });
+            }
         });
 
 

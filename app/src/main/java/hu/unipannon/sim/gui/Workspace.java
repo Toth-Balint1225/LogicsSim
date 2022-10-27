@@ -322,7 +322,10 @@ public final class Workspace extends Group {
     }
 
     public boolean spawnIntegratedComponent(String uid, double x, double y) {
-        var comp = ComponentLoader.getInstance()
+        Optional<GraphicalComponent> comp;
+        var workspace = ComponentLoader.getInstance().locateWorkspace(uid);
+        if (workspace.isPresent()) {
+            comp = ComponentLoader.getInstance()
                 .locateWorkspace(uid).flatMap(wd -> {
                     return wd.toComponent(componentId()).flatMap(gc -> {
                         gc.setPinLocations(wd.pins);
@@ -330,6 +333,21 @@ public final class Workspace extends Group {
                         return Optional.of(gc);
                     });
                 });
+        } else {
+            var type = ComponentLoader.getInstance().locateComponent(uid);
+            if (type.isPresent()) {
+                comp = ComponentLoader.getInstance()
+                    .locateWorkspace(uid).flatMap(wd -> {
+                        return wd.toComponent(componentId()).flatMap(gc -> {
+                            gc.setPinLocations(wd.pins);
+                            gc.setName(wd.name);
+                            return Optional.of(gc);
+                        });
+                    });
+            } else {
+                return false;
+            }
+        }
         if (comp.isPresent()) {
             var gc = comp.get();
             if (GraphicsFactory.giveFromString(gc, "CIRCUIT")) {
@@ -355,6 +373,7 @@ public final class Workspace extends Group {
 
     public WorkspaceData toData(String uid) {
         WorkspaceData res = new WorkspaceData();
+        res.type = "WORKSPACE";
         // graphical stuff
         res.name = this.name;
         res.uid = uid;

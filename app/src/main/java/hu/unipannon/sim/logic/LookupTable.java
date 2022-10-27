@@ -314,4 +314,16 @@ public class LookupTable {
         res.entries = entryBuffer.stream().toArray(WorkspaceData.LUTEntry[]::new);
         return res;
     }
+
+    public boolean[][] inputTable() {
+        return inputTable;
+    }
+
+    public boolean[][] outputTable() {
+        return outputTable;
+    }
+
+    public int rows() {
+        return rows;
+    }
 }

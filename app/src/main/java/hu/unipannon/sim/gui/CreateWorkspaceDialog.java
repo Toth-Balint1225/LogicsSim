@@ -8,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
@@ -35,14 +36,14 @@ public class CreateWorkspaceDialog {
         res = null;
     } 
 
-    public Optional<CreateWorkspaceResult> show() {
+    public Optional<CreateWorkspaceResult> show(String u, String n, double w, double h) {
         Stage stage = new Stage();
         stage.initModality(Modality.APPLICATION_MODAL);
         GridPane root = new GridPane();
-        TextField nameTextField = new TextField();
-        TextField uidTextField = new TextField();
-        TextField widthTextField = new TextField();
-        TextField heightTextField = new TextField();
+        TextField nameTextField = new TextField(n);
+        TextField uidTextField = new TextField(u);
+        TextField widthTextField = new TextField(String.valueOf((int)w));
+        TextField heightTextField = new TextField(String.valueOf((int)h));
         Label lb1 = new Label("Name:");
         Label lb2 = new Label("UID:");
         Label lb3 = new Label("Width:");
@@ -61,10 +62,12 @@ public class CreateWorkspaceDialog {
         root.add(lb3, 0, 2);
         root.add(lb4, 0, 3);
 
-        HBox buttonRow = new HBox();
+        var buttonRow = new AnchorPane();
         root.add(buttonRow,1,4);
 
-        Button submitButton = new Button("Create");
+        Button submitButton = new Button("Ok");
+        AnchorPane.setRightAnchor(submitButton,20.0);
+        buttonRow.getChildren().add(submitButton);
         submitButton.setOnAction(evt -> {
             res = new CreateWorkspaceResult(uidTextField.getText()
                                           , nameTextField.getText()
@@ -72,9 +75,9 @@ public class CreateWorkspaceDialog {
                                           , Integer.parseInt(heightTextField.getText()));
             stage.close();
         });
-        buttonRow.getChildren().add(submitButton);
 
         Button abortButton = new Button("Cancel");
+        AnchorPane.setLeftAnchor(abortButton,20.0);
         abortButton.setOnAction(evt -> {
             stage.close();
         });

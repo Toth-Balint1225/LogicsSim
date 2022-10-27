@@ -11,6 +11,7 @@ public class WorkspaceTab extends Tab {
 
     public WorkspaceTab(Workspace ws) {
         super(ws.getName());
+        
         setClosable(true);
         this.workspace = ws;
         setText(ws.getName());

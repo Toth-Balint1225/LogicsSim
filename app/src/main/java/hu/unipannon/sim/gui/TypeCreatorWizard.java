@@ -8,9 +8,13 @@ import java.util.function.Consumer;
 
 import hu.unipannon.sim.Settings;
 import hu.unipannon.sim.data.TypeData;
+import hu.unipannon.sim.data.WorkspaceData;
+import hu.unipannon.sim.logic.LookupTable;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
@@ -28,9 +32,12 @@ public class TypeCreatorWizard {
         private Pane content;
         private WizardPane<T> prev, next;
         private Consumer<T> snapshotOperation;
+        private Consumer<T> refreshOperation;
 
-        WizardPane(Pane content, Consumer<T> op) {
-            this.snapshotOperation = op;
+
+        WizardPane(Pane content, Consumer<T> snap, Consumer<T> refresh) {
+            this.snapshotOperation = snap;
+            this.refreshOperation = refresh;
             this.content = content;
             prev = null;
             next = null;
@@ -54,60 +61,10 @@ public class TypeCreatorWizard {
             if (snapshotOperation != null)
                 snapshotOperation.accept(data);
         }
-    }
 
-    private static class AddEntryDialog {
-
-        private TypeData.LUTEntry res;
-
-        public AddEntryDialog() {
-            res = null;
-        }
-
-        public Optional<TypeData.LUTEntry> show() {
-            Stage stage = new Stage();
-            stage.initModality(Modality.APPLICATION_MODAL);
-
-            GridPane root = new GridPane();
-
-            Label lb1 = new Label("LHS:");
-            Label lb2 = new Label("RHS:");
-            TextField lhsTextField = new TextField();
-            TextField rhsTextField = new TextField();
-
-            root.add(lb1,0,0);
-            root.add(lb2,0,1);
-
-            root.add(lhsTextField,1,0);
-            root.add(rhsTextField,1,1);
-
-
-            HBox buttonRow = new HBox();
-            root.add(buttonRow,1,4);
-
-            Button submitButton = new Button("Create");
-            submitButton.setOnAction(evt -> {
-                res = new TypeData.LUTEntry();
-                res.lhs = lhsTextField.getText().split(";");
-                res.rhs = rhsTextField.getText().split(";");
-                stage.close();
-            });
-            buttonRow.getChildren().add(submitButton);
-
-            Button abortButton = new Button("Cancel");
-            abortButton.setOnAction(evt -> {
-                stage.close();
-            });
-            buttonRow.getChildren().add(abortButton);
-
-            Scene scene = new Scene(root);
-            scene.getStylesheets().add(getClass().getResource(Settings.getInstance().getData().theme + ".css").toExternalForm());
-            stage.setScene(scene);
-            stage.showAndWait();
-            if (res == null)
-                return Optional.empty();
-            else
-                return Optional.of(res);
+        public void refresh(T data) {
+            if (refreshOperation != null)
+                refreshOperation.accept(data);
         }
     }
 
@@ -122,20 +79,29 @@ public class TypeCreatorWizard {
     private Button prevButton;
     private Stage stage;
     private TypeData res;
+    private LookupTable tmpLut = null;
     private WizardPane<TypeData> active;
+
+    private WizardPane<TypeData> p1;
+    private WizardPane<TypeData> p2;
+    private WizardPane<TypeData> p3;
 
     public TypeCreatorWizard() {
         root = new BorderPane();
         stage = new Stage();
 
-        var p1 = firstStage();
-        var p2 = secondStage();
+        p1 = firstStage();
+        p2 = secondStage();
+        p3 = thirdStage();
         p1.setNext(p2);
+        p2.setNext(p3);
 
         active = p1;
         root.setCenter(active.content);
         root.setTop(new Label("Create new Integrated Component"));
+        root.setManaged(true);
         res = new TypeData();
+        res.type = "TYPE";
 
         nextButton = new Button("Next>");
         nextButton.setOnAction(evt -> {
@@ -187,36 +153,111 @@ public class TypeCreatorWizard {
         return new WizardPane<>(grid, data -> {
             data.name = nameTextField.getText();
             data.uid = nameTextField.getText();
-            data.lut = new TypeData.LUT();
+            data.lut = new WorkspaceData.LUT();
             data.lut.inputs = inputsTextField.getText().split(";"); 
             data.lut.outputs = outputsTextField.getText().split(";");
+
+            p2.refresh(data);
+        },
+        data -> {
         });
     }
 
     private WizardPane<TypeData> secondStage() {
         GridPane grid = new GridPane();
-        List<TypeData.LUTEntry> entries = new LinkedList<>();
-        ListView<String> view = new ListView<>();
-        Button addButton = new Button("Add");
-        addButton.setOnAction(evt -> {
-            new AddEntryDialog().show().ifPresent(entry -> {
-                entries.add(entry);
-                view.getItems().add(String.format("%s - %s",
-                    Arrays.stream(entry.lhs).reduce("", (s1,s2) -> {
-                        return s1 + " " + s2;
-                    }),
-                    Arrays.stream(entry.rhs).reduce("", (s1,s2) -> {
-                        return s1 + " " + s2;
-                    })));
+        return new WizardPane<>(grid, 
+            data -> {
+                // snapshot
+                data.lut = tmpLut.toData();
+                p3.refresh(data);
+            },
+            data -> {
+                // refresh
+                // generate
+                tmpLut = new LookupTable(Arrays.asList(data.lut.inputs), Arrays.asList(data.lut.outputs));
+                grid.getChildren().clear();
+                grid.setHgap(10);
+                grid.setVgap(10);
+                int idx = 0;
+                int inOff = 0;
+                for (var in : tmpLut.inputs()) {
+                    grid.add(new Label(in), idx, 0);
+                    idx++;
+                }
+                inOff = idx;
+                for (var out : tmpLut.outputs()) {
+                    grid.add(new Label(out), idx, 0);
+                    idx++;
+                }
+                var ins = tmpLut.inputTable();
+                var outs = tmpLut.outputTable();
+                for (int i=0;i<tmpLut.rows();i++) {
+                    int row = i;
+                    for (int j=0;j<tmpLut.inputs().size();j++) {
+                        grid.add(new Label(ins[i][j] ? "1" : "0"), j, i + 1);
+                    }
+                    for (int j=0;j<tmpLut.outputs().size();j++) {
+                        CheckBox cb = new CheckBox();
+                        cb.setSelected(outs[i][j]);
+                        grid.add(cb, j + inOff, i + 1);
+                        int col = j;
+                        cb.setOnAction(evt -> {
+                            tmpLut.outputTable()[row][col] = ((CheckBox)evt.getSource()).isSelected();
+                        });
+                    }
+                }
             });
-        });
-        grid.add(view,0,0);
-        grid.add(addButton,1,0);
-        Button remButton = new Button("Remove");
-        return new WizardPane<>(grid, data -> {
-            data.lut.entries = entries.stream().toArray(TypeData.LUTEntry[]::new);
-            return;
-        });
+    }
+
+    private WizardPane<TypeData> thirdStage() {
+        GridPane grid = new GridPane();
+        return new WizardPane<>(grid,
+            data -> {
+            },
+            data -> {
+                data.pins = new WorkspaceData.Pin[data.lut.inputs.length + data.lut.outputs.length];
+                grid.add(new Label("Inputs"), 1,0);
+                grid.add(new Label("Outputs"), 3,0);
+                int idx = 0;
+                int row = 1;
+                for (var in : data.lut.inputs) {
+                    grid.add(new Label(in), 0, row);
+                    ComboBox<String> dirComboBox = new ComboBox<>();
+                    dirComboBox.getItems().addAll("LEFT", "RIGHT", "TOP", "BOTTOM");
+                    dirComboBox.getSelectionModel().select("LEFT");
+                    data.pins[idx] = new WorkspaceData.Pin();
+                    data.pins[idx].input = true;
+                    data.pins[idx].id = in;
+                    data.pins[idx].name = in;
+                    data.pins[idx].direction = "LEFT";
+                    int _idx = idx;
+                    dirComboBox.setOnAction(evt -> {
+                        data.pins[_idx].direction = dirComboBox.getSelectionModel().getSelectedItem();
+                    });
+                    grid.add(dirComboBox, 1, row);
+                    row++;
+                    idx++;
+                }
+                row = 1;
+                for (var out : data.lut.outputs) {
+                    grid.add(new Label(out), 2, row);
+                    ComboBox<String> dirComboBox = new ComboBox<>();
+                    dirComboBox.getItems().addAll("LEFT", "RIGHT", "TOP", "BOTTOM");
+                    dirComboBox.getSelectionModel().select("RIGHT");
+                    data.pins[idx] = new WorkspaceData.Pin();
+                    data.pins[idx].input = false;
+                    data.pins[idx].id = out;
+                    data.pins[idx].name = out;
+                    data.pins[idx].direction = "RIGHT";
+                    int _idx = idx;
+                    dirComboBox.setOnAction(evt -> {
+                        data.pins[_idx].direction = dirComboBox.getSelectionModel().getSelectedItem();
+                    });
+                    grid.add(dirComboBox, 3, row);
+                    row++;
+                    idx++;
+                }
+            });
     }
 
     public Optional<TypeData> show() {
@@ -237,7 +278,6 @@ public class TypeCreatorWizard {
 
         stage.showAndWait();
 
-        System.out.println("Before return " + res.name);
         // swap the panes and return the final result
         return Optional.of(res);
     }

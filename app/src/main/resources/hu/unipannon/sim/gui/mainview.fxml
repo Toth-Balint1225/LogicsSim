@@ -74,7 +74,8 @@
                 </Menu>
                   <Menu mnemonicParsing="false" text="Options">
                     <items>
-                      <MenuItem mnemonicParsing="false" text="Action 1" />
+                      <MenuItem mnemonicParsing="false" onAction="#showWorkspaceOptions" text="Workspace options" />
+                        <MenuItem mnemonicParsing="false" onAction="#showAppOptions" text="Application options" />
                     </items>
                   </Menu>
                 <Menu mnemonicParsing="false" text="Help">
