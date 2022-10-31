@@ -166,7 +166,7 @@ public class WorkspaceData {
             // the optional will persist the data
             return ComponentLoader.getInstance()
                 .locateComponent(c.uid).flatMap(td -> {
-                    return td.toComponent(c).flatMap(gc -> {
+                    return td.toComponent(c.id).flatMap(gc -> {
                         gc.setPinLocations(td.pins);
                         gc.setName(td.name);
                         return Optional.of(gc);

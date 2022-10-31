@@ -1,0 +1,1 @@
+{"type":"TYPE","uid":"std:and","name":"AND_","lut":{"inputs":["x","y"],"outputs":["f"],"entries":[{"rhs":["f"],"lhs":["x","y"]}]},"pins":[{"id":"x","direction":"LEFT","input":true,"name":"x"},{"id":"y","direction":"LEFT","input":true,"name":"y"},{"id":"f","direction":"RIGHT","input":false,"name":"f"}]}

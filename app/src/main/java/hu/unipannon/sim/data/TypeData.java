@@ -18,7 +18,7 @@ public class TypeData {
     public WorkspaceData.Pin[] pins;       
 
     // at this point the type is already loaded from a file
-    public Optional<GraphicalComponent> toComponent(WorkspaceData.Component c) {
+    public Optional<GraphicalComponent> toComponent(String id) {
         // we have a custom component here defined with a LUT
         // generate a component 
         hu.unipannon.sim.logic.Component comp = 
@@ -37,15 +37,10 @@ public class TypeData {
         }
         if (uid == null)
             return Optional.empty();
-        GraphicalComponent gc = new GraphicalComponent(c.id,comp);
+        GraphicalComponent gc = new GraphicalComponent(id,comp);
         gc.setName(name);
         gc.setUid(uid);
         gc.setPinLocations(pins);
-        gc.setTypeString(c.type);
-        if (GraphicsFactory.giveFromString(gc,c.type)) {
-            gc.xProperty().set(c.position.x);
-            gc.yProperty().set(c.position.y);
-        }
         return Optional.of(gc);
     }
 }

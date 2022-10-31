@@ -152,7 +152,7 @@ public class TypeCreatorWizard {
 
         return new WizardPane<>(grid, data -> {
             data.name = nameTextField.getText();
-            data.uid = nameTextField.getText();
+            data.uid = uidTextField.getText();
             data.lut = new WorkspaceData.LUT();
             data.lut.inputs = inputsTextField.getText().split(";"); 
             data.lut.outputs = outputsTextField.getText().split(";");
