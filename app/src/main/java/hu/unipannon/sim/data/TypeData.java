@@ -41,6 +41,7 @@ public class TypeData {
         gc.setName(name);
         gc.setUid(uid);
         gc.setPinLocations(pins);
+        gc.setTypeString("CUSTOM");
         return Optional.of(gc);
     }
 }

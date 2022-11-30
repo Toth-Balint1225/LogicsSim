@@ -95,11 +95,19 @@ public class LookupTable {
     }
 
     public List<String> inputs() {
-        return new LinkedList<String>(inputIndexes.keySet());
+        var res = new String[inputIndexes.entrySet().size()];
+        for (var it  : inputIndexes.entrySet()) {
+            res[it.getValue()] = it.getKey();
+        }
+        return Arrays.asList(res);
     }
 
     public List<String> outputs() {
-        return new LinkedList<String>(outputIndexes.keySet());
+        var res = new String[outputIndexes.entrySet().size()];
+        for (var it  : outputIndexes.entrySet()) {
+            res[it.getValue()] = it.getKey();
+        }
+        return Arrays.asList(res);
     }
 
     private void genTables() {

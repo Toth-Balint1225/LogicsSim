@@ -324,6 +324,7 @@ public final class Workspace extends Group {
     public boolean spawnIntegratedComponent(String uid, double x, double y) {
         Optional<GraphicalComponent> comp = Optional.empty();
         var workspace = ComponentLoader.getInstance().locateWorkspace(uid);
+        boolean isLUT = false;
         if (workspace.isPresent()) {
             comp = workspace.flatMap(wd -> {
                 return wd.toComponent(componentId()).flatMap(gc -> {
@@ -342,6 +343,7 @@ public final class Workspace extends Group {
                         return Optional.of(gc);
                     });
                 });
+                isLUT = true;
             } else {
                 return false;
             }
@@ -351,7 +353,10 @@ public final class Workspace extends Group {
             if (GraphicsFactory.giveFromString(gc, "CIRCUIT")) {
                 gc.xProperty().set(x);
                 gc.yProperty().set(y);
-                gc.setTypeString("CIRCUIT");
+                if (isLUT)
+                    gc.setTypeString("CUSTOM");
+                else
+                    gc.setTypeString("CIRCUIT");
                 // gc.setUid(uid);
                 gc.addToWorkspace(this);
                 return true;

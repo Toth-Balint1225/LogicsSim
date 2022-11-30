@@ -180,12 +180,14 @@ public class TypeCreatorWizard {
                 grid.setVgap(10);
                 int idx = 0;
                 int inOff = 0;
-                for (var in : tmpLut.inputs()) {
+                var inList = tmpLut.inputs();
+                var outList = tmpLut.outputs();
+                for (var in : inList) {
                     grid.add(new Label(in), idx, 0);
                     idx++;
                 }
                 inOff = idx;
-                for (var out : tmpLut.outputs()) {
+                for (var out : outList) {
                     grid.add(new Label(out), idx, 0);
                     idx++;
                 }
