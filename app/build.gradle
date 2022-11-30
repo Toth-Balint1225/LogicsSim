@@ -8,7 +8,10 @@
 
 plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
+    id 'eclipse'
     id 'application'
+    id 'java'
+    id 'org.openjfx.javafxplugin' version '0.0.13'
 }
 
 repositories {
@@ -22,9 +25,45 @@ dependencies {
 
     // This dependency is used by the application.
     implementation 'com.google.guava:guava:29.0-jre'
+    // some epic json features
+    implementation 'com.google.code.gson:gson:2.9.0'
 }
-
+javafx {
+    version = "11.0.2"
+    modules = [ 'javafx.controls', 'javafx.fxml' ]
+}
 application {
     // Define the main class for the application.
-    mainClass = 'hu.uni_pannon.sim.App'
+    mainClass = 'hu.unipannon.sim.App'
+    mainModule = 'hu.unipannon.sim'
+    
+}
+
+test {
+    testLogging.showStandardStreams = true
+}
+
+eclipse {
+    classpath {
+        containers 'org.eclipse.buildship.core.gradleclasspathcontainer'
+        file {
+            whenMerged {
+                entries.findAll { it.properties.kind.equals('lib') && !it.properties.path.contains("junit") }.each {
+                    it.entryAttributes['module'] = 'true'
+                }
+                entries.findAll { it.properties.path.startsWith('org.eclipse.jdt.launching.JRE_CONTAINER') }.each {
+                    it.entryAttributes['module'] = 'true'
+                }
+                entries.find { it.path == 'src/main/java' }.output = 'bin/main'
+                entries.forEach { entry ->
+					def entryIn = { it.find { file(entry.path).equals(it) } }
+					if (entry.kind == 'lib') {
+						entry.entryAttributes['test'] =
+							entryIn(configurations.testRuntimeClasspath) &&
+							!entryIn(configurations.runtimeClasspath)
+					}
+	            }
+            }
+        }
+    }
 }

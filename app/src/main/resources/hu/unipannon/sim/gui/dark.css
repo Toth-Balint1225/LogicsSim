@@ -1,0 +1,149 @@
+.root {
+    -fx-background-color: #333333;
+    background-color: #333333;
+}
+
+/* tab settings */
+#mainTabPane {
+    -fx-background-color: #252526;
+}
+
+.tab-pane .tab-header-area .tab-header-background {
+    -fx-opacity: 0;
+}
+
+
+.tab-pane .tab {
+    -fx-background-color: #333333;
+}
+
+.tab .tab-label {
+    -fx-background-color: #333333;
+    -fx-text-fill: #d4d4d4;
+} 
+
+.tab:selected .tab-label {
+    -fx-background-color: #1e1e1e;
+    -fx-text-fill: #d4d4d4;
+    -fx-font-weight: bold
+} 
+
+.tab-pane .tab:selected {
+    -fx-background-color: #1e1e1e;
+}
+
+.scroll-pane, .scroll-pane > .corner {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar:horizontal, .scroll-bar:vertical {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar:horizontal .track, .scroll-bar:vertical .track {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.scroll-bar:horizontal .thumb, .scroll-bar:vertical .thumb {
+    -fx-background-color: #383838;
+    -fx-background-radius: 0;
+}
+
+/* bar backgrounds */
+#mainToolBar, #mainVBox {
+    -fx-background-color: #333333;
+}
+
+#mainMenuBar {
+    -fx-background-color: #3f3f3f;
+    -fx-text-fill: #d4d4d4;
+}
+
+.button  {
+    -fx-background-color: #333333;
+    -fx-text-fill: #d4d4d4;
+    -fx-corner-radius: 0;
+    -fx-background-radius: 0;
+}
+
+.button:hover {
+    -fx-background-color: #383838;
+    -fx-text-fill: #d4d4d4;
+    -fx-corner-radius: 0;
+    -fx-background-radius: 0;
+}
+
+/* menu stuff */
+.menu, .menu-item, .menu .label, .menu-item .label {
+    -fx-background-color: #3c3c3c;
+    -fx-text-fill: #d4d4d4;
+}
+
+.menu:hover, .menu-item:hover, .menu .label:hover, .menu-item .label:hover {
+    -fx-background-color: #3f3f3f;
+    -fx-text-fill: #d4d4d4;
+}
+
+.context-menu {
+    -fx-background-color: #3c3c3c;
+}
+
+#footerHBox, #filenameLabel {
+    -fx-background-color: #007acc;
+    -fx-text-fill: #d4d4d4;
+}
+
+/* accordion tools */
+.accordion {
+    -fx-background-color: #333333;
+    -fx-text-fill: #d4d4d4;
+}
+
+.titled-pane .title {
+    -fx-background-color: #333333;
+}
+.titled-pane {
+    -fx-text-fill: #d4d4d4;
+    -fx-background-insets: 0;
+}
+
+.list-view .cell , .tree-cell {
+    -fx-background-color: #333333;
+    -fx-text-fill: #d4d4d4;
+}
+
+.list-view .cell:selected, .tree-cell:selected {
+    -fx-background-color: #383838;
+    -fx-text-fill: #d4d4d4;
+    -fx-font-weight: bold;
+}
+
+.tree-cell > .tree-disclosure-node > .arrow {
+    -fx-background-color: #d4d4d4;
+}
+
+.tree-cell:expanded > .tree-disclosure-node > .arrow {
+    -fx-background-color: #d4d4d4;
+}
+
+
+/* inputs, dialogs */
+.label, .combo-box-base, .combo-box .text-field, .combo-box .text-field:focused .combo-box .button {
+    -fx-background-color: #333333;
+    -fx-text-fill: #d4d4d4;
+    -fx-prompt-text-fill: #d4d4d4;
+}
+.text-area, .text-area .content {
+    -fx-background-color: #252526;
+    -fx-text-fill: #d4d4d4;
+}
+.text-field{
+    -fx-background-radius: 0;
+    -fx-background-color: #383838;
+    -fx-text-fill: #d4d4d4;
+}
+
+.check-box {
+    -fx-background-color: #383838;
+}

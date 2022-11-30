@@ -1,0 +1,133 @@
+{ "name": "myWorkspace"
+, "height": 480
+, "width": 640
+, "components": 
+  [ { "id": "component1"
+    , "position":
+      { "x": 50
+      , "y": 50
+      }
+    , "type": "AND"
+    , "pins": null
+    , "lut": null
+    , "name": null
+    , "inputs": 2
+    }
+  , { "id": "component2"
+    , "position":
+      { "x": 100
+      , "y": 100
+      }
+    , "type": "OR"
+    , "pins": null
+    , "lut": null
+    , "name": null
+    , "inputs": 2
+    }
+  , { "id": "component4"
+    , "position":
+      { "x": 200
+      , "y": 200
+      }
+      , "type": "XNOR"
+      , "inputs": 2
+    }
+  , { "id": "component5"
+    , "position":
+      { "x": 400
+      , "y": 200
+      }
+    , "type": "NAND"
+    , "inputs": 3
+    }
+  , { "id": "component5"
+    , "lut": 
+      { "inputs": ["a", "b", "cin"]
+      , "outputs": ["s", "cout"]
+      , "entries":
+        [ { "lhs": ["cin"]
+          , "rhs": ["s"]
+          }
+        , { "lhs": ["b"]
+          , "rhs": ["s"]
+          }
+        , { "lhs": ["b", "cin"]
+          , "rhs": ["cout"]
+          }
+        , { "lhs": ["a"]
+          , "rhs": ["s"]
+          }
+        , { "lhs": ["a", "cin"]
+          , "rhs": ["cout"]
+          }
+        , { "lhs": ["a", "b"]
+          , "rhs": ["cout"]
+          }
+        , { "lhs": ["a", "b", "cin"]
+          , "rhs": ["s", "cout"]
+          }
+        ]
+      }
+    , "position":
+      { "x": 200
+      , "y": 200
+      }
+    , "type": "CUSTOM"
+    , "pins":
+      [ { "id": "a"
+        , "direction": "LEFT"
+        }
+      , { "id": "b"
+        , "direction": "LEFT"
+        }
+      , { "id": "cin"
+        , "direction": "TOP"
+        }
+      , { "id": "s"
+        , "direction": "RIGHT"
+        }
+      , { "id": "cout"
+        , "direction": "BOTTOM"
+        }
+      ]
+    }
+  ]
+, "wires": 
+  [ { "id": "wire1"
+    , "segments":
+      [ { "x": 150
+        , "y": 100
+        }
+      , { "x": 150
+        , "y": 200
+        }
+      ]
+    , "from":
+      { "component": "component1"
+      , "pin": "and"
+      }
+    , "to":
+      { "component": "component2"
+      , "pin": "x1"
+      }
+    }
+  , { "id": "wire2"
+    , "segments":
+      [ { "x": 200
+        , "y": 250
+        }
+      , { "x": 300
+        , "y": 250
+        }
+      ]
+    , "from":
+      { "component": "component3"
+      , "pin": "cout"
+      }
+    , "to":
+      { "component": "component2"
+      , "pin": "x2"
+      }
+    }
+  ]
+}

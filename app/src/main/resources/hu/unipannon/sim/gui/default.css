@@ -1,0 +1,13 @@
+#footerHBox, #filenameLabel {
+    -fx-background-color: #007acc;
+    -fx-text-fill: #d4d4d4;
+}
+
+.button  {
+    -fx-corner-radius: 0;
+    -fx-background-radius: 0;
+}
+
+.text-field{
+    -fx-background-radius: 0;
+}

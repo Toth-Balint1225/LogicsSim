@@ -1,0 +1,53 @@
+{
+    "type": "TYPE",
+    "uid": "std:AND3",
+    "name": "AND3",
+    "lut": {
+        "inputs": [
+            "x0",
+            "x1",
+            "x2"
+        ],
+        "outputs": [
+            "and"
+        ],
+        "entries": [
+            {
+                "rhs": [
+                    "and"
+                ],
+                "lhs": [
+                    "x0",
+                    "x1",
+                    "x2"
+                ]
+            }
+        ]
+    },
+    "pins": [
+        {
+            "id": "x0",
+            "direction": "LEFT",
+            "input": true,
+            "name": "x0"
+        },
+        {
+            "id": "x1",
+            "direction": "LEFT",
+            "input": true,
+            "name": "x1"
+        },
+        {
+            "id": "x2",
+            "direction": "LEFT",
+            "input": true,
+            "name": "x2"
+        },
+        {
+            "id": "and",
+            "direction": "RIGHT",
+            "input": false,
+            "name": "and"
+        }
+    ]
+}
