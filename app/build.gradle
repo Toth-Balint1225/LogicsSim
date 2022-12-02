@@ -43,6 +43,16 @@ test {
     testLogging.showStandardStreams = true
 }
 
+jar {
+    manifest {
+        attributes(
+            'Main-Class': 'hu.unipannon.sim.App'
+        )
+    }
+}
+
+compileJava.options.encoding = 'UTF-8'
+
 eclipse {
     classpath {
         containers 'org.eclipse.buildship.core.gradleclasspathcontainer'

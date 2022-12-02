@@ -325,4 +325,12 @@ public class Controller {
     public Workspace getWorkspace() {
         return workspace;
     }
+
+    @FXML
+    private void showAbout(Event e) {
+        var info = new Alert(AlertType.INFORMATION);
+        info.setTitle("About");
+        info.setContentText("RSZT Logikai Szimulátor (Szakdolgozati projektmunka)\nKészítette: Tóth Bálint, Mérnökinformatikus BSc.\nTémavezető: Éles András\nPannon Egyetem, Rendszer és Számítástudományi Tanszék.\n2022");
+        info.show();
+    }
 }

@@ -1,5 +1,7 @@
 package hu.unipannon.sim;
 
+import java.util.Locale;
+
 import hu.unipannon.sim.data.Serializer;
 import hu.unipannon.sim.gui.Controller;
 import javafx.application.Application;
